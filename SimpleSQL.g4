@@ -11,9 +11,10 @@ table_name: ANY_NAME;
 expr: 
      literal_value  
    | column
-   | expr AND expr
-   | expr OR expr
    | expr ('>' | '<' | '=' | '<>' | '>=' | '<=' | 'is') expr
+   | expr OR expr
+   | expr AND expr
+
    ;
 
 literal_value
