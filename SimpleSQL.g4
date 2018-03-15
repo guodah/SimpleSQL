@@ -1,5 +1,9 @@
 grammar SimpleSQL;
 
+@header {
+    package org.simplesql.parse;
+}
+
 // root rule
 parse : SELECT columns FROM table_name (WHERE expr)? ';'; 
 
@@ -11,7 +15,7 @@ table_name: ANY_NAME;
 expr: 
      literal_value  
    | column
-   | expr ('>' | '<' | '=' | '<>' | '>=' | '<=' | 'is') expr
+   | expr (GTEQ | NEQ | EQ | GT | LTEQ | LT | IS ) expr
    | expr OR expr
    | expr AND expr
 
@@ -22,7 +26,7 @@ literal_value
  | STRING_LITERAL
  | NULL
  ;
-
+ 
 NUMERIC_LITERAL
  : DIGIT+ ( '.' DIGIT* )? ( E [-+]? DIGIT+ )?
  | '.' DIGIT+ ( E [-+]? DIGIT+ )?
@@ -32,6 +36,14 @@ STRING_LITERAL
  : '\'' ( ~'\'' | '\'\'' )* '\''
  ;
 
+EQ : '=';
+NEQ: '<>';
+LTEQ: '<=';
+LT: '<';
+GTEQ: '>=';
+GT: '>';
+
+IS: I S ;
 SELECT: S E L E C T ;
 FROM: F R O M ;
 WHERE: W H E R E ;
