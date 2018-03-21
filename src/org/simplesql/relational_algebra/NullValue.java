@@ -1,5 +1,9 @@
 package org.simplesql.relational_algebra;
 
+import java.io.OutputStream;
+
+import org.simplesql.resolve.SchemaResolver;
+
 public class NullValue extends LiteralValue<Object>{
 
 	public NullValue() {
@@ -9,6 +13,10 @@ public class NullValue extends LiteralValue<Object>{
 	@Override
 	public Object evaluate(Context ctx) {
 		return null;
+	}
+	@Override
+	public String getType(SchemaResolver resolver) {
+		return "NULL";
 	}
 
 }

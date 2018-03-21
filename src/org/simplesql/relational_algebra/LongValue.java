@@ -1,5 +1,9 @@
 package org.simplesql.relational_algebra;
 
+import java.io.OutputStream;
+
+import org.simplesql.resolve.SchemaResolver;
+
 public class LongValue extends LiteralValue<Long>{
 	private long val;
 	public LongValue(long val){
@@ -15,4 +19,9 @@ public class LongValue extends LiteralValue<Long>{
 	public Long evaluate(Context ctx) {
 		return val;
 	}
+	@Override
+	public String getType(SchemaResolver resolver) {
+		return "LONG";
+	}
+
 }

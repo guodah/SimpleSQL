@@ -1,0 +1,27 @@
+[
+{
+	"table": "TestTable",
+	"columns":[
+		{
+			"field": "a",
+			"type": "integer",
+			"default": null
+		},
+		{
+			"field": "b",
+			"type": "integer",
+			"default": null
+		},
+		{
+			"field": "c",
+			"type": "integer",
+			"default": null
+		},
+		{
+			"field": "d",
+			"type": "integer",
+			"default": null
+		}
+	]
+}
+]

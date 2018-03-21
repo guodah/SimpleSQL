@@ -1,5 +1,12 @@
 package org.simplesql.relational_algebra;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
+import org.simplesql.loggin.Logging;
+import org.simplesql.resolve.SchemaResolver;
+import org.simplesql.resolve.Types;
+
 public class BooleanBinaryExpression extends Expression <Boolean>{
 	private String operator;
 	private Expression<?> left, right;
@@ -88,6 +95,32 @@ public class BooleanBinaryExpression extends Expression <Boolean>{
 	private boolean isLogicalOperator(String operator) {
 		return operator.equals("AND") || operator.equals("OR");
 	}
+
+	@Override
+	public boolean resolve(SchemaResolver resolver, OutputStream output) {
+		boolean leftResult = left.resolve(resolver, output);
+		boolean rightResult = right.resolve(resolver, output);
 	
+		if(!leftResult || !rightResult){
+			return false;
+		}
+		
+		if(!Types.isCompatible(
+				left.getType(resolver), right.getType(resolver))){
+			Logging.error(String.format("%s and %s are typed differently", left, right));
+			return false;
+		}
+		
+		if((operator.equals("OR") || operator.equals("AND")) && (!left.getType(resolver).equals("BOOLEAN") ||
+					!right.getType(resolver).equals("BOOLEAN"))){
+			Logging.error(String.format("%s and %s are not BOOLEAN type", left, right));	
+			
+		}
+		
+		return true;
+	}
 	
+	public String getType(SchemaResolver resolver){
+		return "BOOLEAN";
+	}
 }

@@ -1,7 +1,11 @@
 package org.simplesql.relational_algebra;
 
+import java.io.File;
 import java.io.IOException;
-
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Formatter;
 import java.util.List;
 
 import org.antlr.v4.runtime.CharStream;
@@ -13,31 +17,37 @@ import org.simplesql.parse.SimpleSQLParser.ColumnContext;
 import org.simplesql.parse.SimpleSQLParser.ExprContext;
 import org.simplesql.parse.SimpleSQLParser.Literal_valueContext;
 import org.simplesql.parse.SimpleSQLParser.ParseContext;
+import org.simplesql.resolve.SchemaResolver;
 
 public class Utilities {
-	public static Project parseTreeToRelAlg(SimpleSQLParser parser){
+	public static Project parseTreeToRelAlg(SimpleSQLParser parser, URL schema) throws MalformedURLException, IOException{
 		ParseContext tree = parser.parse();
 		Project project = new Project();
-		findColumns(project, tree);
 		findDataSource(project, tree);
 		findFilter(project, tree);
-		return project;
+		findColumns(project, tree);
+		
+		if(!resolve(project, new SchemaResolver(schema), System.out)){
+			return null;
+		}else{
+			return project;
+		}
 	}
 	
 	private static void findFilter(Project project, ParseContext tree){
 		if(tree.WHERE()==null) return;
-		Expression<?> expr = findExpression(tree.expr());
+		Expression<?> expr = findExpression(project, tree.expr());
 		if(expr instanceof BooleanBinaryExpression){
 			Filter filter = new Filter((BooleanBinaryExpression)expr);
 			project.setFilter(filter);
 		}
 	}
 	
-	private static Expression<?> findExpression(ExprContext context){
+	private static Expression<?> findExpression(Project project, ExprContext context){
 		if(context==null){
 			return null;
 		}else if(context.column()!=null){
-			return new Column(context.column().getText());
+			return new Column(project.getDataSource(), context.column().getText());
 		}else if(context.literal_value()!=null){
 			Literal_valueContext literal = context.literal_value();
 			if(literal.NULL()!=null){
@@ -55,8 +65,8 @@ public class Utilities {
 			}
 		}
 		
-		Expression<?> left = findExpression(context.expr(0));
-		Expression<?> right = findExpression(context.expr(1));
+		Expression<?> left = findExpression(project, context.expr(0));
+		Expression<?> right = findExpression(project, context.expr(1));
 		String operator = findOperator(context);
 		return new BooleanBinaryExpression(left, operator, right);
 	}
@@ -88,7 +98,7 @@ public class Utilities {
 	private static void findColumns(Project project, ParseContext tree){
 		List<ColumnContext> columns = tree.columns().column();
 		for(ColumnContext each:columns){
-			project.addColumn(new Column(each.ANY_NAME().getText()));
+			project.addColumn(new Column(project.getDataSource(), each.ANY_NAME().getText()));
 		}		
 	}
 	
@@ -96,12 +106,37 @@ public class Utilities {
 		project.setDataSource(new Table(tree.table_name().ANY_NAME().getText()));
 	}
 	
+	public static boolean resolve(Project ra, SchemaResolver resolver, OutputStream output){
+		
+		
+		boolean result = true;
+		// resolve columns
+		List<Column> columns = ra.getColumns();
+		for(Column each: columns){
+			if(!each.resolve(resolver, output)){
+				result = false;
+			}
+		}
+		// resolve datasource
+		if(!ra.getDataSource().resolve(resolver, output)){
+			result = false;
+		}
+		
+		// resolve filter
+		if(ra.getFilter()!=null && !ra.getFilter().getExpression().resolve(resolver, output)){
+			result = false;
+		}
+		return result;
+		
+	}
+		
 	public static void main(String args[]) throws IOException{
-		CharStream input = CharStreams.fromFileName("test3.sql");
+		CharStream input = CharStreams.fromFileName("test.sql");
 		SimpleSQLLexer lexer = new SimpleSQLLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		SimpleSQLParser parser = new SimpleSQLParser(tokens);
-		Project ra = parseTreeToRelAlg(parser);
+	
+		Project ra = parseTreeToRelAlg(parser, new File("tables/test.json").toURI().toURL());
 		System.out.println(ra);
 	}
 }

@@ -2,6 +2,7 @@ package org.simplesql.files;
 
 import java.io.IOException;
 
+/*
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.ql.exec.vector.LongColumnVector;
@@ -9,8 +10,9 @@ import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.orc.OrcFile;
 import org.apache.orc.TypeDescription;
 import org.apache.orc.Writer;
-
+*/
 public class OrcMain {
+	/*
 	public static void main(String args[]) throws IllegalArgumentException, IOException{
 		Configuration conf = new Configuration();
 		TypeDescription schema = TypeDescription.fromString("struct<x:int,y:int>");
@@ -37,4 +39,5 @@ public class OrcMain {
 		}
 		writer.close();
 	}
+	*/
 }

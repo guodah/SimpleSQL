@@ -1,5 +1,9 @@
 package org.simplesql.relational_algebra;
 
-public class DataSource {
+import java.io.OutputStream;
 
+import org.simplesql.resolve.SchemaResolver;
+
+public abstract class DataSource {
+	abstract public boolean resolve(SchemaResolver resolver, OutputStream output);
 }

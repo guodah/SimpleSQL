@@ -15,6 +15,10 @@ public class Filter {
 		this.expression = expression;
 	}
 	
+	public BooleanBinaryExpression getExpression(){
+		return expression;
+	}
+	
 	public String toString(){
 		return String.format(" where %s", expression);
 	}

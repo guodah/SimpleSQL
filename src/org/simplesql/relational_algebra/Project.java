@@ -24,6 +24,10 @@ public class Project {
 		this.filter = filter;
 	}
 	
+	public List<Column> getColumns(){
+		return columns;
+	}
+	
 	public String toString(){
 		StringBuilder sb = new StringBuilder();
 		sb.append("SELECT ");
@@ -40,5 +44,13 @@ public class Project {
 		}
 		sb.append(";");
 		return sb.toString();
+	}
+
+	public DataSource getDataSource() {
+		return dataSource;
+	}
+
+	public Filter getFilter() {
+		return filter;
 	}
 }

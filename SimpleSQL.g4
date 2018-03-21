@@ -16,8 +16,8 @@ expr:
      literal_value  
    | column
    | expr (GTEQ | NEQ | EQ | GT | LTEQ | LT | IS ) expr
-   | expr OR expr
    | expr AND expr
+   | expr OR expr
 
    ;
 
