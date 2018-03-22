@@ -76,6 +76,22 @@ public class SchemaResolver {
 		
 		return database.get(tableName).get(columnName).get("type");
 	}
-	
-	
+
+	public Object parseValue(String tableName, String columnName, String value) {
+		tableName = tableName.toUpperCase();
+		columnName = columnName.toUpperCase();
+		if(!validateColumn(tableName, columnName)){
+			throw new IllegalStateException("column not found");
+		}
+		
+		String type = Types.getRepresentingType(database.get(tableName).get(columnName).get("type"));
+		if(type.equals("LONG")){
+			return Long.parseLong(value);
+		}else if(type.equals("DOUBLE")){
+			return Double.parseDouble(value);
+		}else{//string
+			return value;
+		}
+	}
+
 }

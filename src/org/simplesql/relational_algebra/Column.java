@@ -2,6 +2,7 @@ package org.simplesql.relational_algebra;
 
 import java.io.OutputStream;
 
+import org.simplesql.iterators.Row;
 import org.simplesql.resolve.SchemaResolver;
 
 public class Column extends Expression<String>{
@@ -21,7 +22,7 @@ public class Column extends Expression<String>{
 	}
 
 	@Override
-	public String evaluate(Context ctx) {
+	public String evaluate(Row ctx) {
 		// ctx unused
 		return toString();
 	}

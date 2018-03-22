@@ -1,5 +1,7 @@
 package org.simplesql.relational_algebra;
 
+import org.simplesql.iterators.Row;
+
 public class Filter {
 	private BooleanBinaryExpression expression;
 	
@@ -21,5 +23,9 @@ public class Filter {
 	
 	public String toString(){
 		return String.format(" where %s", expression);
+	}
+	
+	public boolean evaluate(Row row){
+		return expression.evaluate(row);
 	}
 }

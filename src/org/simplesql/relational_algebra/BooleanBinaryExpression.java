@@ -3,6 +3,7 @@ package org.simplesql.relational_algebra;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.simplesql.iterators.Row;
 import org.simplesql.loggin.Logging;
 import org.simplesql.resolve.SchemaResolver;
 import org.simplesql.resolve.Types;
@@ -21,7 +22,7 @@ public class BooleanBinaryExpression extends Expression <Boolean>{
 	}
 
 	@Override
-	public Boolean evaluate(Context ctx) {
+	public Boolean evaluate(Row ctx) {
 		if(isLogicalOperator(operator)){ // AND or OR
 			boolean leftBool = ((BooleanBinaryExpression)left).evaluate(ctx);
 			boolean rightBool = ((BooleanBinaryExpression)right).evaluate(ctx);
@@ -33,7 +34,7 @@ public class BooleanBinaryExpression extends Expression <Boolean>{
 		}
 	}
 
-	private boolean compare(Expression<?> left, Expression<?> right, Context ctx) {
+	private boolean compare(Expression<?> left, Expression<?> right, Row ctx) {
 		Object leftValue = getLiteral(left, ctx);
 		Object rightValue = getLiteral(right, ctx);
 		
@@ -72,7 +73,7 @@ public class BooleanBinaryExpression extends Expression <Boolean>{
 		return obj1.getClass().equals(obj2.getClass());
 	}
 	
-	private Object getLiteral(Expression<?> expr, Context ctx){
+	private Object getLiteral(Expression<?> expr, Row ctx){
 		// both left and right should be either a literal or a column
 		if(!isLiteralOrColumn(expr)){
 			throw new IllegalStateException(
@@ -81,9 +82,9 @@ public class BooleanBinaryExpression extends Expression <Boolean>{
 
 		Object value = null;
 		if(expr instanceof Column){
-			value = ctx.get(left.toString());
+			value = ctx.get(expr.toString());
 		}else{
-			value = ((LiteralValue)left).evaluate(null);
+			value = ((LiteralValue)expr).evaluate(null);
 		}
 		return value;
 	}

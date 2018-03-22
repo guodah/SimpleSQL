@@ -2,6 +2,7 @@ package org.simplesql.relational_algebra;
 
 import java.io.OutputStream;
 
+import org.simplesql.iterators.Row;
 import org.simplesql.resolve.SchemaResolver;
 
 /*
@@ -15,7 +16,7 @@ expr:
    ;*/
 public abstract class Expression <T>{
 	
-	abstract public T evaluate(Context ctx);
+	abstract public T evaluate(Row ctx);
 	
 	abstract public boolean resolve(SchemaResolver resolver, OutputStream output);
 

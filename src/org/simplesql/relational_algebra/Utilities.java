@@ -11,6 +11,9 @@ import java.util.List;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.simplesql.iterators.IteratorBuilder;
+import org.simplesql.iterators.ProjectIterator;
+import org.simplesql.iterators.Row;
 import org.simplesql.parse.SimpleSQLLexer;
 import org.simplesql.parse.SimpleSQLParser;
 import org.simplesql.parse.SimpleSQLParser.ColumnContext;
@@ -137,6 +140,17 @@ public class Utilities {
 		SimpleSQLParser parser = new SimpleSQLParser(tokens);
 	
 		Project ra = parseTreeToRelAlg(parser, new File("tables/test.json").toURI().toURL());
-		System.out.println(ra);
+		
+		URL csvFile = new File("data/Testtable.csv").toURI().toURL();
+		SchemaResolver resolver = new SchemaResolver(new File("tables/test.json").toURI().toURL());
+		ProjectIterator projectIterator = IteratorBuilder.buildSingleCSVProjectIterator(ra, resolver, csvFile, "testtable");
+		System.out.printf("a\tb\tc\td\n");
+		while(projectIterator.hasNext()){
+			Row row = projectIterator.next();
+			System.out.printf("%s\t%s\t%s\t%s\n", row.get("a"), row.get("b"), 
+					row.get("c"), row.get("d"));
+		}
+		
+//		System.out.println(ra);
 	}
 }
