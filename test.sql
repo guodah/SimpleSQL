@@ -1,2 +1,2 @@
-sELECT a,b,c,   d FROM testtable where a>5 AND b=0 OR d<3;
+sELECT a, b, count(*), sum(c) FROM testtable where a>0 AND b>0 AND d>0 GROUP BY a,b;
 

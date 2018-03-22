@@ -82,7 +82,7 @@ public class BooleanBinaryExpression extends Expression <Boolean>{
 
 		Object value = null;
 		if(expr instanceof Column){
-			value = ctx.get(expr.toString());
+			value = ctx.get(expr.toString()).evaluate(null);
 		}else{
 			value = ((LiteralValue)expr).evaluate(null);
 		}

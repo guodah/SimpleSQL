@@ -24,5 +24,15 @@ public class StringValue extends LiteralValue<String> {
 	public String getType(SchemaResolver resolver) {
 		return "STRING";
 	}
-
+	@Override
+	public int hashCode(){
+		return val.hashCode();
+	}
+	@Override
+	public boolean equals(Object o){
+		if(o instanceof StringValue)
+			return val.equals(((StringValue)o).val);
+		else
+			return false;
+	}
 }

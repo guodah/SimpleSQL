@@ -7,6 +7,8 @@ import org.simplesql.resolve.SchemaResolver;
 
 public class NullValue extends LiteralValue<Object>{
 
+	public final static NullValue NULL= new NullValue();
+	
 	public NullValue() {
 		super(true);
 	}
@@ -20,4 +22,8 @@ public class NullValue extends LiteralValue<Object>{
 		return "NULL";
 	}
 
+	@Override
+	public int hashCode(){
+		return 0;
+	}
 }

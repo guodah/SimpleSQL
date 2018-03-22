@@ -5,10 +5,10 @@ grammar SimpleSQL;
 }
 
 // root rule
-parse : SELECT columns FROM table_name (WHERE expr)? ';'; 
+parse : SELECT columns FROM table_name (WHERE expr)? group_by ';'; 
 
 columns: column (',' column)*;
-column: ANY_NAME;
+column: function | ANY_NAME;
 
 table_name: ANY_NAME;
 
@@ -18,14 +18,25 @@ expr:
    | expr (GTEQ | NEQ | EQ | GT | LTEQ | LT | IS ) expr
    | expr AND expr
    | expr OR expr
-
+   | function
+   | WILDCARD
    ;
+
+function: function_name ('(' expr (',' expr)* ')') | ('(' ')');
+
+group_by: (GROUP BY columns)?;
 
 literal_value
  : NUMERIC_LITERAL
  | STRING_LITERAL
  | NULL
  ;
+ 
+function_name:
+	SUM
+	| AVERAGE
+	| COUNT
+	;
  
 NUMERIC_LITERAL
  : DIGIT+ ( '.' DIGIT* )? ( E [-+]? DIGIT+ )?
@@ -42,7 +53,11 @@ LTEQ: '<=';
 LT: '<';
 GTEQ: '>=';
 GT: '>';
+WILDCARD: '*';
 
+SUM: S U M;
+AVERAGE: A V E R A G E;
+COUNT: C O U N T;
 IS: I S ;
 SELECT: S E L E C T ;
 FROM: F R O M ;
@@ -50,6 +65,8 @@ WHERE: W H E R E ;
 AND: A N D ;
 OR: O R ;
 NULL: N U L L;
+GROUP: G R O U P;
+BY: B Y;
 ANY_NAME : [a-zA-Z]+ ; 
 
 fragment DIGIT : [0-9];

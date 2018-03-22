@@ -8,6 +8,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.simplesql.relational_algebra.DoubleValue;
+import org.simplesql.relational_algebra.LiteralValue;
+import org.simplesql.relational_algebra.LongValue;
+import org.simplesql.relational_algebra.StringValue;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -77,7 +82,7 @@ public class SchemaResolver {
 		return database.get(tableName).get(columnName).get("type");
 	}
 
-	public Object parseValue(String tableName, String columnName, String value) {
+	public LiteralValue parseValue(String tableName, String columnName, String value) {
 		tableName = tableName.toUpperCase();
 		columnName = columnName.toUpperCase();
 		if(!validateColumn(tableName, columnName)){
@@ -86,11 +91,11 @@ public class SchemaResolver {
 		
 		String type = Types.getRepresentingType(database.get(tableName).get(columnName).get("type"));
 		if(type.equals("LONG")){
-			return Long.parseLong(value);
+			return new LongValue(Long.parseLong(value));
 		}else if(type.equals("DOUBLE")){
-			return Double.parseDouble(value);
+			return new DoubleValue(Double.parseDouble(value));
 		}else{//string
-			return value;
+			return new StringValue(value);
 		}
 	}
 

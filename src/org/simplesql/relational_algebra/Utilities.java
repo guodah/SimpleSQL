@@ -30,6 +30,9 @@ public class Utilities {
 		findFilter(project, tree);
 		findColumns(project, tree);
 		
+		findAggregates(project, tree);
+		findGroupBy(project, tree);
+		
 		if(!resolve(project, new SchemaResolver(schema), System.out)){
 			return null;
 		}else{
@@ -37,6 +40,45 @@ public class Utilities {
 		}
 	}
 	
+	private static void findGroupBy(Project project, ParseContext tree) {
+		if(tree.group_by()==null) return;
+		
+		List<ColumnContext> columns = tree.group_by().columns().column();
+		GroupBy groupBy = new GroupBy();
+		for(ColumnContext each:columns){
+			groupBy.addColumn(new Column(project.getDataSource(), each.ANY_NAME().getText()));
+		}
+		groupBy.setAggregates(project.getAggregates());
+		project.addGroupBy(groupBy);
+	}
+
+	private static void findAggregates(Project project, ParseContext tree) {
+		List<ColumnContext> columns = tree.columns().column();
+		for(ColumnContext each:columns){
+			if(each.function()!=null){
+				Column column = null;
+				if(each.function().expr().get(0).column()!=null){
+					column = new Column(project.getDataSource(), each.function().expr().get(0).column().getText());
+				}else if(each.function().expr().get(0).WILDCARD()!=null){
+					column = new Column(project.getDataSource(), "*");
+				}
+				
+				project.addAggregate(findAggregateFunction(column, each.function().function_name().getText()));
+			}
+		}		
+	}
+
+	private static Aggregate findAggregateFunction(Column column, String text) {
+		text = text.toUpperCase();
+		if(text.equals("SUM")){
+			return new AggregateSum(column);
+		}else if(text.equals("COUNT")){
+			return new AggregateCount(column);
+		}else{
+			throw new IllegalStateException("unsupported aggregate function");
+		}
+	}
+
 	private static void findFilter(Project project, ParseContext tree){
 		if(tree.WHERE()==null) return;
 		Expression<?> expr = findExpression(project, tree.expr());
@@ -101,7 +143,9 @@ public class Utilities {
 	private static void findColumns(Project project, ParseContext tree){
 		List<ColumnContext> columns = tree.columns().column();
 		for(ColumnContext each:columns){
-			project.addColumn(new Column(project.getDataSource(), each.ANY_NAME().getText()));
+			if(each.ANY_NAME()!=null){
+				project.addColumn(new Column(project.getDataSource(), each.ANY_NAME().getText()));
+			}
 		}		
 	}
 	
@@ -141,16 +185,16 @@ public class Utilities {
 	
 		Project ra = parseTreeToRelAlg(parser, new File("tables/test.json").toURI().toURL());
 		
-		URL csvFile = new File("data/Testtable.csv").toURI().toURL();
+		URL csvFile = new File("data/Testtable_groups.csv").toURI().toURL();
 		SchemaResolver resolver = new SchemaResolver(new File("tables/test.json").toURI().toURL());
 		ProjectIterator projectIterator = IteratorBuilder.buildSingleCSVProjectIterator(ra, resolver, csvFile, "testtable");
-		System.out.printf("a\tb\tc\td\n");
+		System.out.printf("a\tb\tCOUNT(*)\tSUM(c)\n");
 		while(projectIterator.hasNext()){
 			Row row = projectIterator.next();
-			System.out.printf("%s\t%s\t%s\t%s\n", row.get("a"), row.get("b"), 
-					row.get("c"), row.get("d"));
+			System.out.printf("%d\t%d\t%d\t%d\n", row.get("a").evaluate(null), row.get("b").evaluate(null),
+					row.get("COUNT(*)").evaluate(null), row.get("SUM(c)").evaluate(null));
 		}
 		
-//		System.out.println(ra);
+		System.out.println(ra);
 	}
 }

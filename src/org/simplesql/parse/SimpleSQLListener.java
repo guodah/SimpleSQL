@@ -60,6 +60,26 @@ public interface SimpleSQLListener extends ParseTreeListener {
 	 */
 	void exitExpr(SimpleSQLParser.ExprContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link SimpleSQLParser#function}.
+	 * @param ctx the parse tree
+	 */
+	void enterFunction(SimpleSQLParser.FunctionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link SimpleSQLParser#function}.
+	 * @param ctx the parse tree
+	 */
+	void exitFunction(SimpleSQLParser.FunctionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link SimpleSQLParser#group_by}.
+	 * @param ctx the parse tree
+	 */
+	void enterGroup_by(SimpleSQLParser.Group_byContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link SimpleSQLParser#group_by}.
+	 * @param ctx the parse tree
+	 */
+	void exitGroup_by(SimpleSQLParser.Group_byContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link SimpleSQLParser#literal_value}.
 	 * @param ctx the parse tree
 	 */
@@ -69,4 +89,14 @@ public interface SimpleSQLListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitLiteral_value(SimpleSQLParser.Literal_valueContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link SimpleSQLParser#function_name}.
+	 * @param ctx the parse tree
+	 */
+	void enterFunction_name(SimpleSQLParser.Function_nameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link SimpleSQLParser#function_name}.
+	 * @param ctx the parse tree
+	 */
+	void exitFunction_name(SimpleSQLParser.Function_nameContext ctx);
 }

@@ -1,12 +1,16 @@
 package org.simplesql.iterators;
 
 import java.util.HashMap;
+
 import java.util.Map;
 
+import org.simplesql.relational_algebra.DoubleValue;
+import org.simplesql.relational_algebra.LiteralValue;
+import org.simplesql.relational_algebra.LongValue;
 import org.simplesql.resolve.SchemaResolver;
 
 public class Row {
-	private Map<String, Object> fields;
+	private Map<String, LiteralValue> fields;
 	private String tableName;
 	private SchemaResolver resolver;
 	
@@ -20,16 +24,16 @@ public class Row {
 		fields = new HashMap<>();
 	}
 	
-	public void put(String fieldName, Object value){
+	public void put(String fieldName, LiteralValue value){
 		fields.put(fieldName, value);
 	}
 	public long getFieldAsLong(String fieldName){
-		return ((Long)fields.get(fieldName)).longValue();
+		return ((LongValue)fields.get(fieldName)).evaluate(null);
 	}
 	public double getFieldAsDouble(String fieldName){
-		return ((Double)fields.get(fieldName)).doubleValue();
+		return ((DoubleValue)fields.get(fieldName)).evaluate(null);
 	}
-	public Object get(String fieldName){
+	public LiteralValue get(String fieldName){
 		return fields.get(fieldName);
 	}
 

@@ -25,4 +25,17 @@ public class LongValue extends LiteralValue<Long>{
 		return "LONG";
 	}
 
+	@Override
+	public int hashCode(){
+		return new Long(val).hashCode();
+	}
+
+	
+	@Override
+	public boolean equals(Object o){
+		if(o instanceof LongValue)
+			return val==((LongValue)o).val;
+		else
+			return false;
+	}
 }

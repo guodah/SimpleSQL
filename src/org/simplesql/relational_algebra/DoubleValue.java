@@ -30,4 +30,17 @@ public class DoubleValue extends LiteralValue<Double>{
 	public String getType(SchemaResolver resolver) {
 		return "DOUBLE";
 	}
+	
+	@Override
+	public int hashCode(){
+		return new Double(val).hashCode();
+	}
+
+	@Override
+	public boolean equals(Object o){
+		if(o instanceof DoubleValue)
+			return val==((DoubleValue)o).val;
+		else
+			return false;
+	}
 }

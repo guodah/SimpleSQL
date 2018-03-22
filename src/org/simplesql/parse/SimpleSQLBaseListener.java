@@ -78,6 +78,30 @@ public class SimpleSQLBaseListener implements SimpleSQLListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterFunction(SimpleSQLParser.FunctionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFunction(SimpleSQLParser.FunctionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterGroup_by(SimpleSQLParser.Group_byContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitGroup_by(SimpleSQLParser.Group_byContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterLiteral_value(SimpleSQLParser.Literal_valueContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -85,6 +109,18 @@ public class SimpleSQLBaseListener implements SimpleSQLListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitLiteral_value(SimpleSQLParser.Literal_valueContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterFunction_name(SimpleSQLParser.Function_nameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFunction_name(SimpleSQLParser.Function_nameContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
