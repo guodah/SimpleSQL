@@ -309,8 +309,8 @@ public class SimpleSQLParser extends Parser {
 		public TerminalNode LTEQ() { return getToken(SimpleSQLParser.LTEQ, 0); }
 		public TerminalNode LT() { return getToken(SimpleSQLParser.LT, 0); }
 		public TerminalNode IS() { return getToken(SimpleSQLParser.IS, 0); }
-		public TerminalNode OR() { return getToken(SimpleSQLParser.OR, 0); }
 		public TerminalNode AND() { return getToken(SimpleSQLParser.AND, 0); }
+		public TerminalNode OR() { return getToken(SimpleSQLParser.OR, 0); }
 		public ExprContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -400,7 +400,7 @@ public class SimpleSQLParser extends Parser {
 						setState(42);
 						if (!(precpred(_ctx, 2))) throw new FailedPredicateException(this, "precpred(_ctx, 2)");
 						setState(43);
-						match(OR);
+						match(AND);
 						setState(44);
 						expr(3);
 						}
@@ -412,7 +412,7 @@ public class SimpleSQLParser extends Parser {
 						setState(45);
 						if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
 						setState(46);
-						match(AND);
+						match(OR);
 						setState(47);
 						expr(2);
 						}
@@ -517,7 +517,7 @@ public class SimpleSQLParser extends Parser {
 		"\3\2\2\2\34\37\3\2\2\2\35\33\3\2\2\2\35\36\3\2\2\2\36\5\3\2\2\2\37\35"+
 		"\3\2\2\2 !\7\24\2\2!\7\3\2\2\2\"#\7\24\2\2#\t\3\2\2\2$%\b\6\1\2%(\5\f"+
 		"\7\2&(\5\6\4\2\'$\3\2\2\2\'&\3\2\2\2(\64\3\2\2\2)*\f\5\2\2*+\t\2\2\2+"+
-		"\63\5\n\6\6,-\f\4\2\2-.\7\22\2\2.\63\5\n\6\5/\60\f\3\2\2\60\61\7\21\2"+
+		"\63\5\n\6\6,-\f\4\2\2-.\7\21\2\2.\63\5\n\6\5/\60\f\3\2\2\60\61\7\22\2"+
 		"\2\61\63\5\n\6\4\62)\3\2\2\2\62,\3\2\2\2\62/\3\2\2\2\63\66\3\2\2\2\64"+
 		"\62\3\2\2\2\64\65\3\2\2\2\65\13\3\2\2\2\66\64\3\2\2\2\678\t\3\2\28\r\3"+
 		"\2\2\2\7\24\35\'\62\64";
