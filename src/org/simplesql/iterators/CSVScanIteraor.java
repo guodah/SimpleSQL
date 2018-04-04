@@ -12,12 +12,15 @@ public class CSVScanIteraor implements ScanIterator{
 	private Scanner scanner;
 	private SchemaResolver resolver;
 	private String tableName;
+	private URL csvFile;
 	public CSVScanIteraor(SchemaResolver resolver, URL csvFile, String tableName) throws IOException{
-		scanner = new Scanner(csvFile.openStream());
-		String line = scanner.nextLine();
-		fieldNames = line.split(",");
+		this.csvFile = csvFile; 
 		this.tableName = tableName;		
 		this.resolver = resolver;
+
+		scanner = new Scanner(this.csvFile.openStream());
+		String line = scanner.nextLine();
+		fieldNames = line.split(",");
 	}
 	@Override
 	public boolean hasNext() {
@@ -36,6 +39,14 @@ public class CSVScanIteraor implements ScanIterator{
 			row.put(fieldNames[i], resolver.parseValue(tableName, fieldNames[i], values[i]));
 		}
 		return row;
+	}
+	@Override
+	public void reset() {
+		try{
+			scanner = new Scanner(csvFile.openStream());
+		}catch(IOException e){
+			throw new IllegalStateException("Unable to reopen "+ csvFile);
+		}
 	}
 
 	

@@ -40,6 +40,26 @@ public interface SimpleSQLListener extends ParseTreeListener {
 	 */
 	void exitColumn(SimpleSQLParser.ColumnContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link SimpleSQLParser#data_source}.
+	 * @param ctx the parse tree
+	 */
+	void enterData_source(SimpleSQLParser.Data_sourceContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link SimpleSQLParser#data_source}.
+	 * @param ctx the parse tree
+	 */
+	void exitData_source(SimpleSQLParser.Data_sourceContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link SimpleSQLParser#join_operator}.
+	 * @param ctx the parse tree
+	 */
+	void enterJoin_operator(SimpleSQLParser.Join_operatorContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link SimpleSQLParser#join_operator}.
+	 * @param ctx the parse tree
+	 */
+	void exitJoin_operator(SimpleSQLParser.Join_operatorContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link SimpleSQLParser#table_name}.
 	 * @param ctx the parse tree
 	 */
@@ -49,6 +69,16 @@ public interface SimpleSQLListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitTable_name(SimpleSQLParser.Table_nameContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link SimpleSQLParser#join_type}.
+	 * @param ctx the parse tree
+	 */
+	void enterJoin_type(SimpleSQLParser.Join_typeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link SimpleSQLParser#join_type}.
+	 * @param ctx the parse tree
+	 */
+	void exitJoin_type(SimpleSQLParser.Join_typeContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link SimpleSQLParser#expr}.
 	 * @param ctx the parse tree

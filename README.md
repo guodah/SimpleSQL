@@ -13,4 +13,6 @@ This is a project for me to experience the process of **parsing**, **compiling**
 
 **March 22, 2018**: Added iterators for project, filter and CSV scan. Right now, the code can compile, resolve, and execute a very simple SQL query (single table and no subqueries). (not much testing performed)
 
-**March 28, 2018**: Added the code for two aggregate functions (sum and count) and the "group by" clause. (not much testing performed.)
+**March 28, 2018**: Added code for two aggregate functions (sum and count) and the "group by" clause. (not much testing performed.)
+
+**April 4, 2018**: Added code for natural join. (not much testing performed.)

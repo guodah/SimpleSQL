@@ -1,6 +1,7 @@
 package org.simplesql.iterators;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.simplesql.relational_algebra.Aggregate;
@@ -44,4 +45,16 @@ public class ProjectIterator implements Iterator<Row>{
 		return res;
 	}
 
+	@Override
+	public void reset() {
+		downStream.reset();
+	}
+
+	public List<Column> getColumns(){
+		return project.getColumns();
+	}
+	
+	public List<Aggregate> getAggregates(){
+		return project.getAggregates();
+	}
 }

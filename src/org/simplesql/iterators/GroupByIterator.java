@@ -28,7 +28,7 @@ public class GroupByIterator implements Iterator<Row> {
 		this.downStream = downStream;
 		map = new HashMap<Object, Object>();
 		buildGroups();
-		findRows();
+		findRows();		
 	}
 	
 	
@@ -79,14 +79,9 @@ public class GroupByIterator implements Iterator<Row> {
 
 	private void buildBuckets(List<Column> columns, Row row, List<Aggregate> buckets) {
 		Map<Object, Object> tmap = map;
-//		System.out.printf("map size is %d, key set is %s\n", map.size(), map.keySet());
 		for(int i=0;i<columns.size();i++){
 			String field = columns.get(i).toString();
 			Object value = row.get(field);
-			
-			if(((LongValue)value).evaluate(null)==4){
-				System.out.println();
-			}
 			
 			if(!tmap.containsKey(value)){
 				if(i==columns.size()-1){
@@ -134,5 +129,14 @@ public class GroupByIterator implements Iterator<Row> {
 	@Override
 	public Row next() {
 		return rowIterator.next();
+	}
+
+
+	@Override
+	public void reset() {
+		downStream.reset();
+		map = new HashMap<Object, Object>();
+		buildGroups();
+		findRows();		
 	}
 }

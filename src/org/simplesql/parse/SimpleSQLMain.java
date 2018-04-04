@@ -15,7 +15,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 public class SimpleSQLMain {
 	public static void main(String args[]) throws IOException{
-		CharStream input = CharStreams.fromFileName("test.sql");
+		CharStream input = CharStreams.fromFileName("test_natural_join.sql");
 		SimpleSQLLexer lexer = new SimpleSQLLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		SimpleSQLParser parser = new SimpleSQLParser(tokens);

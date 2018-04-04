@@ -54,6 +54,30 @@ public class SimpleSQLBaseListener implements SimpleSQLListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterData_source(SimpleSQLParser.Data_sourceContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitData_source(SimpleSQLParser.Data_sourceContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterJoin_operator(SimpleSQLParser.Join_operatorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitJoin_operator(SimpleSQLParser.Join_operatorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterTable_name(SimpleSQLParser.Table_nameContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -61,6 +85,18 @@ public class SimpleSQLBaseListener implements SimpleSQLListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitTable_name(SimpleSQLParser.Table_nameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterJoin_type(SimpleSQLParser.Join_typeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitJoin_type(SimpleSQLParser.Join_typeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

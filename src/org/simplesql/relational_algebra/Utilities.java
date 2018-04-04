@@ -17,6 +17,7 @@ import org.simplesql.iterators.Row;
 import org.simplesql.parse.SimpleSQLLexer;
 import org.simplesql.parse.SimpleSQLParser;
 import org.simplesql.parse.SimpleSQLParser.ColumnContext;
+import org.simplesql.parse.SimpleSQLParser.Data_sourceContext;
 import org.simplesql.parse.SimpleSQLParser.ExprContext;
 import org.simplesql.parse.SimpleSQLParser.Literal_valueContext;
 import org.simplesql.parse.SimpleSQLParser.ParseContext;
@@ -150,9 +151,23 @@ public class Utilities {
 	}
 	
 	private static void findDataSource(Project project, ParseContext tree){
-		project.setDataSource(new Table(tree.table_name().ANY_NAME().getText()));
+		DataSource dataSource = findDataSource(tree.data_source());
+		project.setDataSource(dataSource);
 	}
 	
+	private static DataSource findDataSource(Data_sourceContext data_sourceContext) {
+		if(data_sourceContext.table_name()!=null){
+			return new Table(data_sourceContext.table_name().getText());
+		}else if(data_sourceContext.join_operator()!=null){
+			List<Data_sourceContext> dataSources = data_sourceContext.data_source();
+			DataSource left = findDataSource(dataSources.get(0));
+			DataSource right = findDataSource(dataSources.get(1));
+			return Join.defineJoin(left, right, data_sourceContext.join_operator().join_type().getText());
+		}else{
+			throw new IllegalStateException("unsupported data source: "+data_sourceContext.getText());
+		}
+	}
+
 	public static boolean resolve(Project ra, SchemaResolver resolver, OutputStream output){
 		
 		
@@ -173,28 +188,54 @@ public class Utilities {
 		if(ra.getFilter()!=null && !ra.getFilter().getExpression().resolve(resolver, output)){
 			result = false;
 		}
+		
+		
 		return result;
 		
 	}
 		
 	public static void main(String args[]) throws IOException{
-		CharStream input = CharStreams.fromFileName("test.sql");
+		testNaturalJoin("schema/test.json", "sql/test_natural_join.sql");
+	}
+
+	private static void testNaturalJoin(String schemaPath, String sqlFile)throws IOException{
+		CharStream input = CharStreams.fromFileName(sqlFile);
 		SimpleSQLLexer lexer = new SimpleSQLLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		SimpleSQLParser parser = new SimpleSQLParser(tokens);
-	
-		Project ra = parseTreeToRelAlg(parser, new File("tables/test.json").toURI().toURL());
-		
-		URL csvFile = new File("data/Testtable_groups.csv").toURI().toURL();
-		SchemaResolver resolver = new SchemaResolver(new File("tables/test.json").toURI().toURL());
-		ProjectIterator projectIterator = IteratorBuilder.buildSingleCSVProjectIterator(ra, resolver, csvFile, "testtable");
-		System.out.printf("a\tb\tCOUNT(*)\tSUM(c)\n");
-		while(projectIterator.hasNext()){
-			Row row = projectIterator.next();
-			System.out.printf("%d\t%d\t%d\t%d\n", row.get("a").evaluate(null), row.get("b").evaluate(null),
-					row.get("COUNT(*)").evaluate(null), row.get("SUM(c)").evaluate(null));
-		}
-		
+
+		Project ra = parseTreeToRelAlg(parser, new File(schemaPath).toURI().toURL());
 		System.out.println(ra);
+		
+		SchemaResolver resolver = new SchemaResolver(new File(schemaPath).toURI().toURL());
+		ProjectIterator projectIterator = IteratorBuilder.buildCSVProjectIterator(ra, resolver);
+		print(projectIterator);		
+	}
+	
+	private static void print(ProjectIterator projectIterator) {
+		List<Column> columns = projectIterator.getColumns();
+		StringBuilder sb = new StringBuilder();
+		for(Column each:columns){
+			sb.append(each.toString()+"\t");
+		}
+		if(projectIterator.getAggregates()!=null){
+			for(Aggregate aggregate:projectIterator.getAggregates()){
+				sb.append(aggregate.toString()+"\t");
+			}
+		}
+		System.out.println(sb.toString());
+		while(projectIterator.hasNext()){
+			sb = new StringBuilder();
+			Row row = projectIterator.next();
+			for(Column each:columns){
+				sb.append(row.get(each.toString())+"\t");
+			}		
+			if(projectIterator.getAggregates()!=null){
+				for(Aggregate aggregate:projectIterator.getAggregates()){
+					sb.append(row.get(aggregate.toString())+"\t");
+				}
+			}
+			System.out.println(sb.toString());
+		}
 	}
 }

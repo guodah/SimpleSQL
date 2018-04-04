@@ -30,4 +30,9 @@ public class FilterIterator implements Iterator<Row>{
 		return nextRow;
 	}
 
+	@Override
+	public void reset() {
+		downStream.reset();
+	}
+
 }

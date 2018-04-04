@@ -23,27 +23,27 @@ public class Column extends Expression<String>{
 
 	@Override
 	public String evaluate(Row ctx) {
-		// ctx unused
 		return toString();
 	}
 
 	@Override
 	public boolean resolve(SchemaResolver resolver, OutputStream output) {
-		if(dataSource instanceof Table){
-			return resolver.validateColumn(((Table) dataSource).tableName(), columnName);
-		}
-		
-		throw new IllegalStateException("unsupported input");
+		return resolver.validateColumn(columnName);
 	}
 	
 	public String getType(SchemaResolver resolver){
 		if(!resolve(resolver, null)){
 			throw new IllegalStateException("Column not found");
 		}
-		if(dataSource instanceof Table){
-			return resolver.getType(((Table) dataSource).tableName(), columnName);
-		}
-		throw new IllegalStateException("unsupported type");
+		return resolver.getType(columnName);
 	}
 
+	
+	@Override
+	public boolean equals(Object c){
+		if(c instanceof Column)
+			return columnName.equals(c.toString());
+		else
+			return false;
+	}
 }

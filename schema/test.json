@@ -1,0 +1,81 @@
+[
+{
+	"table": "TestTableA",
+	"path": "data/testtableA.csv",
+	"columns":[
+		{
+			"field": "a",
+			"type": "integer",
+			"default": null
+		},
+		{
+			"field": "b",
+			"type": "integer",
+			"default": null
+		},
+		{
+			"field": "c",
+			"type": "integer",
+			"default": null
+		},
+		{
+			"field": "d",
+			"type": "integer",
+			"default": null
+		}
+	]
+},
+{
+	"table": "TestTableB",
+	"path": "data/testtableB.csv",
+	"columns":[
+		{
+			"field": "a",
+			"type": "integer",
+			"default": null
+		},
+		{
+			"field": "b",
+			"type": "integer",
+			"default": null
+		},
+		{
+			"field": "e",
+			"type": "integer",
+			"default": null
+		},
+		{
+			"field": "f",
+			"type": "integer",
+			"default": null
+		}
+	]
+},
+{
+	"table": "TestTableC",
+	"path": "data/testtableC.csv",
+	"columns":[
+		{
+			"field": "a",
+			"type": "integer",
+			"default": null
+		},
+		{
+			"field": "b",
+			"type": "integer",
+			"default": null
+		},
+		{
+			"field": "g",
+			"type": "integer",
+			"default": null
+		},
+		{
+			"field": "h",
+			"type": "integer",
+			"default": null
+		}
+	]
+}
+
+]

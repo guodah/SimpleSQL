@@ -5,12 +5,21 @@ grammar SimpleSQL;
 }
 
 // root rule
-parse : SELECT columns FROM table_name (WHERE expr)? group_by ';'; 
+parse : SELECT columns FROM data_source (WHERE expr)? (group_by)? ';'; 
 
 columns: column (',' column)*;
 column: function | ANY_NAME;
 
+data_source:
+	table_name
+	| data_source join_operator data_source
+	;
+
+join_operator: join_type JOIN;
+
 table_name: ANY_NAME;
+
+join_type: NATURAL;
 
 expr: 
      literal_value  
@@ -24,7 +33,7 @@ expr:
 
 function: function_name ('(' expr (',' expr)* ')') | ('(' ')');
 
-group_by: (GROUP BY columns)?;
+group_by: GROUP BY columns;
 
 literal_value
  : NUMERIC_LITERAL
@@ -55,6 +64,8 @@ GTEQ: '>=';
 GT: '>';
 WILDCARD: '*';
 
+NATURAL: N A T U R A L;
+JOIN: J O I N;
 SUM: S U M;
 AVERAGE: A V E R A G E;
 COUNT: C O U N T;
