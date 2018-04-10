@@ -1,5 +1,9 @@
 package org.simplesql.relational_algebra;
 
+import java.io.OutputStream;
+
+import org.simplesql.resolve.SchemaResolver;
+
 public class AggregateCount extends Aggregate {
 	private int count;
 	public AggregateCount(Column column) {
@@ -29,5 +33,10 @@ public class AggregateCount extends Aggregate {
 	
 	public AggregateCount duplicate(){
 		return new AggregateCount(column);
+	}
+
+	@Override
+	public boolean resolve(DataSource dataSource, SchemaResolver resolver, OutputStream output) {
+		return true;
 	}
 }

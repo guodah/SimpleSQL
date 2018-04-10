@@ -66,6 +66,30 @@ public class SimpleSQLBaseListener implements SimpleSQLListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterJoin_condition(SimpleSQLParser.Join_conditionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitJoin_condition(SimpleSQLParser.Join_conditionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterTable_column(SimpleSQLParser.Table_columnContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitTable_column(SimpleSQLParser.Table_columnContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterJoin_operator(SimpleSQLParser.Join_operatorContext ctx) { }
 	/**
 	 * {@inheritDoc}

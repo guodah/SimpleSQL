@@ -20,10 +20,12 @@ abstract public class Join extends DataSource{
 		return left.resolve(resolver, output) && right.resolve(resolver, output);
 	}
 	
-	public static Join defineJoin(DataSource left, DataSource right, String joinMethod){
+	public static Join defineJoin(DataSource left, DataSource right, String joinMethod, BooleanBinaryExpression expression){
 		joinMethod = joinMethod.toUpperCase();
 		if(joinMethod.equals("NATURAL")){
 			return new NaturalJoin(left, right);
+		}else if(joinMethod.equals("INNER")){
+			return new InnerJoin(left, right, expression);
 		}else{
 			throw new IllegalStateException("unsupported join: "+joinMethod);
 		}
@@ -36,4 +38,5 @@ abstract public class Join extends DataSource{
 	public DataSource getRight(){
 		return right;
 	}
+	
 }

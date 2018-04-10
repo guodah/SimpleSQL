@@ -16,3 +16,13 @@ This is a project for me to experience the process of **parsing**, **compiling**
 **March 28, 2018**: Added code for two aggregate functions (sum and count) and the "group by" clause. (not much testing performed.)
 
 **April 4, 2018**: Added code for natural join. (not much testing performed.)
+
+**April 10, 2018**: Rewrote the code for resolver. Now the resolver is able to locate columns without specifying a table. After being resolved, each column identifies a table name and column name. I believe this needs to be done before implementing inner join.
+
+**plan**:
+* merge-sort equi-join
+* join condition w/ nested loop  
+* add count distinct
+* expression, such as x+5>y+4
+* subqueries
+

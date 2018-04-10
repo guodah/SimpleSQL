@@ -13,11 +13,11 @@ import org.simplesql.resolve.SchemaResolver;
 /**
  * Loads the left data source to the memory first and build a hash map
  */
-public class NaturalJoinItrator extends JoinIterator {
+public class NaturalJoinHashItrator extends JoinIterator {
 	private java.util.Iterator<Row> joinResultIterator;
 	private Map<Object, Object> map;
 	private List<Column> commonColumns;
-	public NaturalJoinItrator(NaturalJoin operator, Iterator<Row> left, Iterator<Row> right, SchemaResolver resolver) {
+	public NaturalJoinHashItrator(NaturalJoin operator, Iterator<Row> left, Iterator<Row> right, SchemaResolver resolver) {
 		super(operator, left, right, resolver);
 		map = new HashMap<>();
 		commonColumns = operator.findCommonColumns(resolver);

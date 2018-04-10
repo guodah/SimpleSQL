@@ -1,5 +1,6 @@
 package org.simplesql.relational_algebra;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -33,21 +34,22 @@ public class Utilities {
 		
 		findAggregates(project, tree);
 		findGroupBy(project, tree);
-		
-		if(!resolve(project, new SchemaResolver(schema), System.out)){
+				
+		if(!project.resolve(new SchemaResolver(schema), System.out)){
 			return null;
 		}else{
 			return project;
 		}
 	}
 	
+
 	private static void findGroupBy(Project project, ParseContext tree) {
 		if(tree.group_by()==null) return;
 		
 		List<ColumnContext> columns = tree.group_by().columns().column();
 		GroupBy groupBy = new GroupBy();
 		for(ColumnContext each:columns){
-			groupBy.addColumn(new Column(project.getDataSource(), each.ANY_NAME().getText()));
+			groupBy.addColumn(findColumn(each));
 		}
 		groupBy.setAggregates(project.getAggregates());
 		project.addGroupBy(groupBy);
@@ -59,9 +61,9 @@ public class Utilities {
 			if(each.function()!=null){
 				Column column = null;
 				if(each.function().expr().get(0).column()!=null){
-					column = new Column(project.getDataSource(), each.function().expr().get(0).column().getText());
+					column = findColumn(each.function().expr().get(0).column());
 				}else if(each.function().expr().get(0).WILDCARD()!=null){
-					column = new Column(project.getDataSource(), "*");
+					column = new Column("*");
 				}
 				
 				project.addAggregate(findAggregateFunction(column, each.function().function_name().getText()));
@@ -82,18 +84,18 @@ public class Utilities {
 
 	private static void findFilter(Project project, ParseContext tree){
 		if(tree.WHERE()==null) return;
-		Expression<?> expr = findExpression(project, tree.expr());
+		Expression<?> expr = findExpression(tree.expr());
 		if(expr instanceof BooleanBinaryExpression){
 			Filter filter = new Filter((BooleanBinaryExpression)expr);
 			project.setFilter(filter);
 		}
 	}
 	
-	private static Expression<?> findExpression(Project project, ExprContext context){
+	private static Expression<?> findExpression(ExprContext context){
 		if(context==null){
 			return null;
 		}else if(context.column()!=null){
-			return new Column(project.getDataSource(), context.column().getText());
+			return findColumn(context.column());
 		}else if(context.literal_value()!=null){
 			Literal_valueContext literal = context.literal_value();
 			if(literal.NULL()!=null){
@@ -111,8 +113,8 @@ public class Utilities {
 			}
 		}
 		
-		Expression<?> left = findExpression(project, context.expr(0));
-		Expression<?> right = findExpression(project, context.expr(1));
+		Expression<?> left = findExpression( context.expr(0));
+		Expression<?> right = findExpression( context.expr(1));
 		String operator = findOperator(context);
 		return new BooleanBinaryExpression(left, operator, right);
 	}
@@ -144,10 +146,26 @@ public class Utilities {
 	private static void findColumns(Project project, ParseContext tree){
 		List<ColumnContext> columns = tree.columns().column();
 		for(ColumnContext each:columns){
-			if(each.ANY_NAME()!=null){
-				project.addColumn(new Column(project.getDataSource(), each.ANY_NAME().getText()));
+			Column column = findColumn(each);
+			if(column!=null){
+				project.addColumn(column);
 			}
 		}		
+	}
+	
+	private static Column findColumn(ColumnContext each){
+		if(each.ANY_NAME()!=null){
+			String column = each.ANY_NAME().getText();
+			return new Column(column);
+		}else if(each.table_column()!=null){
+			String table = each.table_column().ANY_NAME().get(0).getText();
+			String column = each.table_column().ANY_NAME().get(1).getText();
+			return new Column(table, column);		
+		}else if(each.function()!=null){
+			return null;
+		}else{
+			throw new IllegalStateException("unsupport column");
+		}
 	}
 	
 	private static void findDataSource(Project project, ParseContext tree){
@@ -160,46 +178,42 @@ public class Utilities {
 			return new Table(data_sourceContext.table_name().getText());
 		}else if(data_sourceContext.join_operator()!=null){
 			List<Data_sourceContext> dataSources = data_sourceContext.data_source();
-			DataSource left = findDataSource(dataSources.get(0));
-			DataSource right = findDataSource(dataSources.get(1));
-			return Join.defineJoin(left, right, data_sourceContext.join_operator().join_type().getText());
+			DataSource left = findDataSource( dataSources.get(0));
+			DataSource right = findDataSource( dataSources.get(1));
+			
+			Expression<?> joinCondition = null;
+			if(data_sourceContext.join_condition()!=null){
+				joinCondition = findExpression(data_sourceContext.join_condition().expr());
+			}
+
+			String joinType = data_sourceContext.join_operator().join_type().getText(); 
+			if(joinType.equals("NATURAL") || joinType.equals("INNER") && 
+					joinCondition instanceof BooleanBinaryExpression){
+				return Join.defineJoin(left, right, data_sourceContext.join_operator().join_type().getText(), 
+						(BooleanBinaryExpression)joinCondition);
+			}else{
+				throw new IllegalStateException("unsupported join condition");
+			}
 		}else{
 			throw new IllegalStateException("unsupported data source: "+data_sourceContext.getText());
 		}
 	}
 
-	public static boolean resolve(Project ra, SchemaResolver resolver, OutputStream output){
-		
-		
-		boolean result = true;
-		// resolve columns
-		List<Column> columns = ra.getColumns();
-		for(Column each: columns){
-			if(!each.resolve(resolver, output)){
-				result = false;
-			}
-		}
-		// resolve datasource
-		if(!ra.getDataSource().resolve(resolver, output)){
-			result = false;
-		}
-		
-		// resolve filter
-		if(ra.getFilter()!=null && !ra.getFilter().getExpression().resolve(resolver, output)){
-			result = false;
-		}
-		
-		
-		return result;
-		
-	}
-		
+
 	public static void main(String args[]) throws IOException{
-		testNaturalJoin("schema/test.json", "sql/test_natural_join.sql");
+		test("schema/test.json", "sELECT testtableA.a, testtableB.b FROM testtableA "+
+					"inner join testtableB on testtableA.a=testtableB.a and testtableA.b=testtableB.b;");
+
+		test("schema/test.json", "sELECT a, b, sum(c), count(*) FROM testtableA  natural join testtableB "+
+					"where a>1 and b<5 GROUP BY a,b;");
+
+		test("schema/test.json", "sELECT a, b,c,d,e,  g FROM testtableA natural join testtableB "+
+					"natural join testtableC;");
 	}
 
-	private static void testNaturalJoin(String schemaPath, String sqlFile)throws IOException{
-		CharStream input = CharStreams.fromFileName(sqlFile);
+	private static void test(String schemaPath, String sql)throws IOException{
+//		CharStream input = CharStreams.fromFileName(sqlFile);
+		CharStream input = CharStreams.fromStream(new ByteArrayInputStream(sql.toUpperCase().getBytes()));
 		SimpleSQLLexer lexer = new SimpleSQLLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		SimpleSQLParser parser = new SimpleSQLParser(tokens);
@@ -207,9 +221,9 @@ public class Utilities {
 		Project ra = parseTreeToRelAlg(parser, new File(schemaPath).toURI().toURL());
 		System.out.println(ra);
 		
-		SchemaResolver resolver = new SchemaResolver(new File(schemaPath).toURI().toURL());
-		ProjectIterator projectIterator = IteratorBuilder.buildCSVProjectIterator(ra, resolver);
-		print(projectIterator);		
+//		SchemaResolver resolver = new SchemaResolver(new File(schemaPath).toURI().toURL());
+//		ProjectIterator projectIterator = IteratorBuilder.buildCSVProjectIterator(ra, resolver);
+//		print(projectIterator);		
 	}
 	
 	private static void print(ProjectIterator projectIterator) {

@@ -1,7 +1,10 @@
 package org.simplesql.relational_algebra;
 
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.simplesql.resolve.SchemaResolver;
 
 public class GroupBy {
 	private List<Column> columns;
@@ -29,6 +32,21 @@ public class GroupBy {
 	
 	public List<Column> getColumns(){
 		return columns;
+	}
+	
+	public boolean resolve(DataSource dataSource, SchemaResolver resolver, OutputStream output){
+		for(Column column:columns){
+			if(!column.resolve(dataSource, resolver, output)){
+				return false;
+			}
+		}
+		
+		for(Aggregate aggregate:aggregates){
+			if(!aggregate.resolve(dataSource, resolver, output)){
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	public String toString(){

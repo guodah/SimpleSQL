@@ -98,9 +98,9 @@ public class BooleanBinaryExpression extends Expression <Boolean>{
 	}
 
 	@Override
-	public boolean resolve(SchemaResolver resolver, OutputStream output) {
-		boolean leftResult = left.resolve(resolver, output);
-		boolean rightResult = right.resolve(resolver, output);
+	public boolean resolve(DataSource dataSource, SchemaResolver resolver, OutputStream output) {
+		boolean leftResult = left.resolve(dataSource, resolver, output);
+		boolean rightResult = right.resolve(dataSource, resolver, output);
 	
 		if(!leftResult || !rightResult){
 			return false;
@@ -115,7 +115,6 @@ public class BooleanBinaryExpression extends Expression <Boolean>{
 		if((operator.equals("OR") || operator.equals("AND")) && (!left.getType(resolver).equals("BOOLEAN") ||
 					!right.getType(resolver).equals("BOOLEAN"))){
 			Logging.error(String.format("%s and %s are not BOOLEAN type", left, right));	
-			
 		}
 		
 		return true;
@@ -124,4 +123,5 @@ public class BooleanBinaryExpression extends Expression <Boolean>{
 	public String getType(SchemaResolver resolver){
 		return "BOOLEAN";
 	}
+
 }

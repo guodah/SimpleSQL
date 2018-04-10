@@ -41,7 +41,7 @@ public class IteratorBuilder {
 			Iterator<Row> right = buildDataSourceIterator(join.getRight(), resolver);
 			
 			if(join instanceof NaturalJoin){
-				return new NaturalJoinItrator((NaturalJoin)join, left, right, resolver);
+				return new NaturalJoinHashItrator((NaturalJoin)join, left, right, resolver);
 			}else{
 				throw new IllegalStateException("unsupported type of join");
 			}

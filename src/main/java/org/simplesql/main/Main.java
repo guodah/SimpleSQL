@@ -21,8 +21,8 @@ import static org.simplesql.relational_algebra.Utilities.parseTreeToRelAlg;
 
 public class Main {
 	public static void main(String args[]) throws IOException{
-//		execute("schema/test.json", "sql/test_aggregate.sql");
-//		execute("schema/test.json", "sql/test_natural_join.sql");
+		execute("schema/test.json", "sql/test_aggregate.sql");
+		execute("schema/test.json", "sql/test_natural_join.sql");
 		execute("schema/test.json", "sql/test_agg_filter_join.sql");
 	}
 

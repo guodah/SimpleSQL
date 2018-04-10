@@ -1,1 +1,1 @@
-java -cp .\antlr-4.7.1-complete.jar;%CLASSPATH% org.antlr.v4.Tool -o src\org\simplesql\parse\ %*
+java -cp .\antlr-4.7.1-complete.jar;%CLASSPATH% org.antlr.v4.Tool -o src\main\java\org\simplesql\parse\ %*

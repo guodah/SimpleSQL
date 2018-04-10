@@ -42,4 +42,22 @@ public class NaturalJoin extends Join{
 	public String toString(){
 		return String.format(" %s natural join %s", left, right);
 	}
+
+	@Override
+	public Table findColumn(String column, SchemaResolver resolver) {
+		List<Column> leftColumns = left.getColumns(resolver);
+		for(Column each:leftColumns){
+			if(each.getColumn().equals(column)){
+				return new Table(each.getTableName());
+			}
+		}
+
+		List<Column> rightColumns = right.getColumns(resolver);
+		for(Column each:rightColumns){
+			if(each.getColumn().equals(column)){
+				return new Table(each.getTableName());
+			}
+		}
+		return null;
+	}
 }

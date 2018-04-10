@@ -28,4 +28,14 @@ public class Table extends DataSource{
 		}
 		return resolver.findColumns(tableName);
 	}
+	@Override
+	public Table findColumn(String column, SchemaResolver resolver) {
+		List<Column> columns = getColumns(resolver);
+		for(Column each: columns){
+			if(each.getColumn().equals(column)){
+				return this; 
+			}
+		}
+		return null;
+	}
 }

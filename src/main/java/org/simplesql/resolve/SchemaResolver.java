@@ -61,6 +61,9 @@ public class SchemaResolver {
 	}
 
 	public boolean validateColumn(String table, String column){
+		if(table==null){
+			return validateColumn(column);
+		}
 		table = table.toUpperCase();
 		column = column.toUpperCase();
 		return schema.containsKey(table) && schema.get(table).containsKey(column);
@@ -99,6 +102,9 @@ public class SchemaResolver {
 	}
 	
 	public String getType(String tableName, String columnName) {
+		if(tableName==null){
+			return getType(columnName);
+		}
 		tableName = tableName.toUpperCase();
 		columnName = columnName.toUpperCase();
 		if(!validateColumn(tableName, columnName)){
@@ -133,7 +139,7 @@ public class SchemaResolver {
 		
 		List<Column> columns = new ArrayList<>();
 		for(String columnName:schema.get(tableName).keySet()){
-			columns.add(new Column(columnName));
+			columns.add(new Column(tableName, columnName));
 		}
 		return columns;
 	}

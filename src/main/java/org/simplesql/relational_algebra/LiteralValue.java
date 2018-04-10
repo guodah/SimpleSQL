@@ -20,7 +20,7 @@ public abstract class LiteralValue<T> extends Expression<T> {
 		return isNull?"null":"";
 	}
 	
-	public boolean resolve(SchemaResolver resolver, OutputStream output){
+	public boolean resolve(DataSource dataSource, SchemaResolver resolver, OutputStream output){
 		return true;
 	}
 }

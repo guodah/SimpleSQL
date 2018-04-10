@@ -1,8 +1,11 @@
 package org.simplesql.relational_algebra;
 
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 import java.util.List;
+
+import org.simplesql.resolve.SchemaResolver;
 
 
 public class Project {
@@ -91,4 +94,35 @@ public class Project {
 	public List<Aggregate> getAggregates(){
 		return aggregates;
 	}
+
+	public DataSource getTable(String table) {
+		return dataSource.findTable(table);
+	}
+	
+	public boolean resolve(SchemaResolver resolver, OutputStream output){
+		boolean result = true;
+		
+		// resolve the data source
+		result = result && dataSource.resolve(resolver, output);
+		
+		// resolve the where clause
+		if(filter!=null){
+			result = result && filter.resolve(dataSource, resolver, output);
+		}
+		
+		// resolve the project columns
+		for(Column column:columns){
+			result = result && column.resolve(dataSource, resolver, output);
+		}
+		
+		// resolve the group by clause
+		result = result && (groupBy==null || groupBy.resolve(dataSource, resolver, output));
+		
+		// resolve the aggregate functions
+		for(Aggregate aggregate:aggregates){
+			result = result && aggregate.resolve(dataSource, resolver, output);
+		}
+		return result;
+	}
+
 }

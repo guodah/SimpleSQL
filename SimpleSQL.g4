@@ -8,18 +8,22 @@ grammar SimpleSQL;
 parse : SELECT columns FROM data_source (WHERE expr)? (group_by)? ';'; 
 
 columns: column (',' column)*;
-column: function | ANY_NAME;
+column: function | table_column | ANY_NAME;
 
 data_source:
 	table_name
-	| data_source join_operator data_source
+	| data_source join_operator data_source (join_condition)?
 	;
+
+join_condition: ON expr;
+
+table_column: ANY_NAME '.' ANY_NAME;
 
 join_operator: join_type JOIN;
 
 table_name: ANY_NAME;
 
-join_type: NATURAL;
+join_type: NATURAL | INNER;
 
 expr: 
      literal_value  
@@ -64,7 +68,9 @@ GTEQ: '>=';
 GT: '>';
 WILDCARD: '*';
 
+ON: O N;
 NATURAL: N A T U R A L;
+INNER: I N N E R;
 JOIN: J O I N;
 SUM: S U M;
 AVERAGE: A V E R A G E;

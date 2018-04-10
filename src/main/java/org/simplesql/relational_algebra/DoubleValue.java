@@ -22,11 +22,6 @@ public class DoubleValue extends LiteralValue<Double>{
 	}
 
 	@Override
-	public boolean resolve(SchemaResolver resolver, OutputStream output) {
-		return true;
-	}
-
-	@Override
 	public String getType(SchemaResolver resolver) {
 		return "DOUBLE";
 	}
@@ -43,4 +38,5 @@ public class DoubleValue extends LiteralValue<Double>{
 		else
 			return false;
 	}
+
 }

@@ -1,0 +1,1 @@
+sELECT testtableA.a, testtableB.b FROM testtableA inner join testtableB on testtableA.a=testtableB.a and testtableA.b=testtableB.b;
