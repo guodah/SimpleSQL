@@ -30,33 +30,12 @@ public class BooleanBinaryExpression extends Expression <Boolean>{
 			return operator.equals("AND")?(leftBool && rightBool):(leftBool || rightBool); 
 		}else{ // comparison
 			
-			return compare(left, right, ctx);
+			return compare(ctx);
 		}
 	}
 
-	private boolean compare(Expression<?> left, Expression<?> right, Row ctx) {
-		Object leftValue = getLiteral(left, ctx);
-		Object rightValue = getLiteral(right, ctx);
-		
-		if(leftValue==null || rightValue==null){
-			return leftValue==rightValue;
-		}
-		
-		// as of now (March 15) only null, long, double and String are supported
-		int compareCode = 0;
-		if(areSameType(leftValue, rightValue)){
-			compareCode = ((Comparable)leftValue).compareTo(rightValue);
-		}else if(leftValue instanceof String || rightValue instanceof String){
-			throw new IllegalStateException("uncomparable data types");
-		}else{
-			if(leftValue instanceof Long && rightValue instanceof Double){
-				compareCode = ((Long)leftValue > (Double)rightValue)?1:-1;
-			}else if(leftValue instanceof Double && rightValue instanceof Long){
-				compareCode = ((Double)leftValue > (Long)rightValue)?1:-1;
-			}else{
-				throw new IllegalStateException("uncomparable data types");
-			}
-		}
+	private boolean compare(Row ctx) {
+		int compareCode = Expression.compare(left, right, ctx);
 		
 		switch(operator){
 		case "=": return compareCode==0;
@@ -67,30 +46,6 @@ public class BooleanBinaryExpression extends Expression <Boolean>{
 		case "<": return compareCode<0;
 		default: throw new IllegalStateException("unsupported operator "+operator);
 		}
-	}
-
-	private boolean areSameType(Object obj1, Object obj2){
-		return obj1.getClass().equals(obj2.getClass());
-	}
-	
-	private Object getLiteral(Expression<?> expr, Row ctx){
-		// both left and right should be either a literal or a column
-		if(!isLiteralOrColumn(expr)){
-			throw new IllegalStateException(
-					"unimplemented: comparing objects other than literal or column");
-		}
-
-		Object value = null;
-		if(expr instanceof Column){
-			value = ctx.get(expr.toString()).evaluate(null);
-		}else{
-			value = ((LiteralValue)expr).evaluate(null);
-		}
-		return value;
-	}
-	
-	private boolean isLiteralOrColumn(Expression<?> expr) {
-		return (expr instanceof LiteralValue) || (expr instanceof Column);
 	}
 
 	private boolean isLogicalOperator(String operator) {

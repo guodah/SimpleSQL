@@ -30,23 +30,5 @@ public abstract class DataSource {
 		return null;
 	}
 	
-	abstract public Table findColumn(String column, SchemaResolver resolver) ;
-	/*
-	public List<Table> findColumn(String column, SchemaResolver resolver) {
-		List<Table> tables = new ArrayList<>();
-		findColumn(this, column, resolver, tables);
-		return tables;
-	}
-	
-	private void findColumn(DataSource dataSource, String column, SchemaResolver resolver, List<Table> tables) {
-		if(dataSource instanceof Table){
-			if(resolver.validateColumn(((Table)dataSource).tableName(), column)){
-				tables.add((Table)dataSource);
-			}
-		}else if(dataSource instanceof Join){
-			findColumn(((Join)dataSource).getLeft(), column, resolver, tables);
-			findColumn(((Join)dataSource).getRight(), column, resolver, tables);
-		}
-	}
-	*/
+	abstract public Table locateColumn(String column, SchemaResolver resolver) ;
 }

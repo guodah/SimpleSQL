@@ -43,7 +43,7 @@ public class Column extends Expression<String>{
 			resolved = dataSource.findTable(tableName)!=null && 
 					resolver.validateColumn(tableName, columnName);
 		}else{
-			Table table = dataSource.findColumn(columnName, resolver);
+			Table table = dataSource.locateColumn(columnName, resolver);
 			tableName = table.tableName();
 			resolved = (table!=null);
 		}

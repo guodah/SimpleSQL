@@ -4,7 +4,8 @@ import java.io.OutputStream;
 
 import org.simplesql.resolve.SchemaResolver;
 
-public abstract class LiteralValue<T> extends Expression<T> {
+
+public abstract class LiteralValue<T extends Comparable<T>> extends Expression<Comparable<T>> {
 	private boolean isNull;
 
 	

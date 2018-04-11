@@ -17,8 +17,11 @@ public class NaturalJoin extends Join{
 		
 		List<Column> res = new ArrayList<Column>();
 		for(Column lc:leftColumns){
-			if(rightColumns.contains(lc)){
-				res.add(lc);
+			for(Column rc:rightColumns){
+				if(lc.getColumn().equals(rc.getColumn())){
+					res.add(lc);
+					break;
+				}
 			}
 		}
 		return res;
@@ -44,7 +47,7 @@ public class NaturalJoin extends Join{
 	}
 
 	@Override
-	public Table findColumn(String column, SchemaResolver resolver) {
+	public Table locateColumn(String column, SchemaResolver resolver) {
 		List<Column> leftColumns = left.getColumns(resolver);
 		for(Column each:leftColumns){
 			if(each.getColumn().equals(column)){

@@ -14,9 +14,9 @@ import org.simplesql.resolve.SchemaResolver;
 public class IteratorBuilder {
 
 	
-	public static ProjectIterator buildCSVProjectIterator(Project project, SchemaResolver resolver)
+	public static ProjectIterator buildCSVProjectIterator(Project project, SchemaResolver resolver, boolean sort)
 		throws IOException{
-		Iterator<Row> iterator = buildDataSourceIterator(project.getDataSource(), resolver);
+		Iterator<Row> iterator = buildDataSourceIterator(project.getDataSource(), resolver, sort);
 		if(project.getFilter()!=null){
 			FilterIterator filterIterator = new FilterIterator(iterator, project.getFilter());
 			iterator = filterIterator;
@@ -31,20 +31,21 @@ public class IteratorBuilder {
 	}
 
 	private static Iterator<Row> buildDataSourceIterator(DataSource dataSource, 
-			SchemaResolver resolver) throws IOException {
+			SchemaResolver resolver, boolean sort) throws IOException {
 		if(dataSource instanceof Table){
 			String tableName = ((Table) dataSource).tableName();
 			return new CSVScanIteraor(resolver, resolver.getTablePath(tableName), tableName);
 		}else if(dataSource instanceof Join){
 			Join join = (Join) dataSource;
-			Iterator<Row> left = buildDataSourceIterator(join.getLeft(), resolver);
-			Iterator<Row> right = buildDataSourceIterator(join.getRight(), resolver);
+			Iterator<Row> left = buildDataSourceIterator(join.getLeft(), resolver, sort);
+			Iterator<Row> right = buildDataSourceIterator(join.getRight(), resolver, sort);
 			
-			if(join instanceof NaturalJoin){
-				return new NaturalJoinHashItrator((NaturalJoin)join, left, right, resolver);
-			}else{
-				throw new IllegalStateException("unsupported type of join");
-			}
+			return JoinIteratorBuilder.
+					newInstance().
+					useSort(sort).
+					setJoin(join).
+					setDataSourceIterator(left, right).
+					setResolver(resolver).build();
 		}else{
 			throw new IllegalStateException("unsupported type of data source");
 		}

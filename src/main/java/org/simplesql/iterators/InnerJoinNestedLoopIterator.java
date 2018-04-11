@@ -11,7 +11,7 @@ import org.simplesql.resolve.SchemaResolver;
 public class InnerJoinNestedLoopIterator extends JoinIterator{
 	private List<Row> leftRows;
 	private List<Row> rightRows;
-	private List<Row> resultRows;
+	private java.util.Iterator<Row> joinResultIterator;
 	public InnerJoinNestedLoopIterator(InnerJoin operator, Iterator<Row> left, Iterator<Row> right, SchemaResolver resolver) {
 		super(operator, left, right, resolver);
 		
@@ -19,30 +19,34 @@ public class InnerJoinNestedLoopIterator extends JoinIterator{
 		leftRows = new ArrayList<>();
 		rightRows = new ArrayList<>();
 		
+		List<Row> joinResult = new ArrayList<>();
+		
 		while(left.hasNext()){
 			leftRows.add(left.next());
 		}
 		while(right.hasNext()){
-			rightRows.add(left.next());
+			rightRows.add(right.next());
 		}
 		
 		for(Row row1:leftRows){
 			for(Row row2:rightRows){
-				
+				if(operator.evaluateJoinCondition(row1, row2)){
+					joinResult.add(Row.combine(row1, row2));
+				}
 			}
 		}
+		
+		joinResultIterator = joinResult.iterator();
 	}
 
 	@Override
 	public boolean hasNext() {
-		// TODO Auto-generated method stub
-		return false;
+		return joinResultIterator.hasNext();
 	}
 
 	@Override
 	public Row next() {
-		// TODO Auto-generated method stub
-		return null;
+		return joinResultIterator.next();
 	}
 
 }

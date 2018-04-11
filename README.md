@@ -19,9 +19,9 @@ This is a project for me to experience the process of **parsing**, **compiling**
 
 **April 10, 2018**: Rewrote the code for resolver. Now the resolver is able to locate columns without specifying a table. After being resolved, each column identifies a table name and column name. I believe this needs to be done before implementing inner join.
 
+**April 11, 2018**: Added code for natural join based on sorting and inner join with join condition based on nested loops.
+
 **plan**:
-* merge-sort equi-join
-* join condition w/ nested loop  
 * add count distinct
 * expression, such as x+5>y+4
 * subqueries

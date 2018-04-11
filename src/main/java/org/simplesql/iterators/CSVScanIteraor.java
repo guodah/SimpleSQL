@@ -36,7 +36,7 @@ public class CSVScanIteraor implements ScanIterator{
 		String[] values = scanner.nextLine().split(",");
 		Row row = new Row(tableName, resolver);
 		for(int i=0;i<values.length;i++){
-			row.put(fieldNames[i], resolver.parseValue(tableName, fieldNames[i], values[i]));
+			row.put(tableName+"."+fieldNames[i], resolver.parseValue(tableName, fieldNames[i], values[i]));
 		}
 		return row;
 	}

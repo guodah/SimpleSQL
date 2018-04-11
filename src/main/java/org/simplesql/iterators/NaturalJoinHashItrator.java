@@ -43,9 +43,9 @@ public class NaturalJoinHashItrator extends JoinIterator {
 		List<Row> rows = null;
 		List<Row> result = new ArrayList<>();
 		for(int i=0;i<commonColumns.size();i++){
-			String field = commonColumns.get(i).toString();
+			String column = commonColumns.get(i).getColumn();
 			@SuppressWarnings("rawtypes")
-			LiteralValue value = row.get(field);
+			LiteralValue value = row.getValueWithoutTable(column);
 			
 			if(!tmap.containsKey(value)){
 				return result;
@@ -71,13 +71,27 @@ public class NaturalJoinHashItrator extends JoinIterator {
 		}
 		
 		for(String field:row2.getFieldNames()){
-			if(!row.containsField(field)){
+			if(!isACommonColumn(field)){
 				row.put(field, row2.get(field));
 			}
 		}
 		return row;
 	}
+	private boolean isACommonColumn(String field) {
+		int dotPosition = field.indexOf('.');
+		if(dotPosition<0){
+			throw new IllegalStateException("row header does not contain table name");
+		}
+		field = field.substring(dotPosition+1);
+		for(Column each:commonColumns){
+			if(each.getColumn().equals(field)){
+				return true;
+			}
+		}
+		return false;
+	}
 
+	
 	private void buildBuckets(){
 		while(left.hasNext()){
 			buildBuckets(left.next());
@@ -89,9 +103,9 @@ public class NaturalJoinHashItrator extends JoinIterator {
 		Map<Object, Object> tmap = map;
 		
 		for(int i=0;i<commonColumns.size();i++){
-			String field = commonColumns.get(i).toString();
+			String column = commonColumns.get(i).getColumn();
 			@SuppressWarnings("rawtypes")
-			LiteralValue value = row.get(field);
+			LiteralValue value = row.getValueWithoutTable(column);
 		
 			if(!tmap.containsKey(value)){
 				if(i==commonColumns.size()-1){

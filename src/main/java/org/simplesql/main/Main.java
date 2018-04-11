@@ -1,5 +1,6 @@
 package org.simplesql.main;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -21,39 +22,32 @@ import static org.simplesql.relational_algebra.Utilities.parseTreeToRelAlg;
 
 public class Main {
 	public static void main(String args[]) throws IOException{
-		execute("schema/test.json", "sql/test_aggregate.sql");
-		execute("schema/test.json", "sql/test_natural_join.sql");
-		execute("schema/test.json", "sql/test_agg_filter_join.sql");
+		execute("schema/test.json", "sELECT testtableA.a, testtableB.b FROM testtableA "+
+				"inner join testtableB on testtableA.a=testtableB.a and testtableA.b=testtableB.b;");
+
+//		execute("schema/test.json", "sELECT a, b, sum(c), count(*) FROM testtableA  natural join testtableB "+
+//				"where a>1 and b<5 GROUP BY a,b;");
+
+//		execute("schema/test.json", "sELECT a, b,c,d,e,  g FROM testtableA natural join testtableB "+
+//				"natural join testtableC;");
+
+//		execute("schema/test.json", "sELECT a, b,c,d,e FROM testtableA "+
+//				"natural join testtableB;");
 	}
 
-	private static void execute(String schemaPath, String sqlFile) throws IOException {
-		CharStream input = CharStreams.fromFileName(sqlFile);
+	private static void execute(String schemaPath, String sql) throws IOException {
+		CharStream input = CharStreams.fromStream(new ByteArrayInputStream(sql.toUpperCase().getBytes()));
 		SimpleSQLLexer lexer = new SimpleSQLLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		SimpleSQLParser parser = new SimpleSQLParser(tokens);
 
-		Project ra = parseTreeToRelAlg(parser, new File(schemaPath).toURI().toURL());
-		System.out.println(ra);
+		Project project = parseTreeToRelAlg(parser, new File(schemaPath).toURI().toURL());
+		System.out.println(project);
 		
 		SchemaResolver resolver = new SchemaResolver(new File(schemaPath).toURI().toURL());
-		ProjectIterator projectIterator = IteratorBuilder.buildCSVProjectIterator(ra, resolver);
+		ProjectIterator projectIterator = IteratorBuilder.buildCSVProjectIterator(project, resolver, false);
 		print(projectIterator);				
 	}
-/*
-	private static void execute(String schemaPath, String sqlFile)throws IOException{
-		CharStream input = CharStreams.fromFileName(sqlFile);
-		SimpleSQLLexer lexer = new SimpleSQLLexer(input);
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		SimpleSQLParser parser = new SimpleSQLParser(tokens);
-
-		Project ra = parseTreeToRelAlg(parser, new File(schemaPath).toURI().toURL());
-		System.out.println(ra);
-		
-		SchemaResolver resolver = new SchemaResolver(new File(schemaPath).toURI().toURL());
-		ProjectIterator projectIterator = IteratorBuilder.buildCSVProjectIterator(ra, resolver);
-		print(projectIterator);		
-	}
-*/	
 	private static void print(ProjectIterator projectIterator) {
 		List<Column> columns = projectIterator.getColumns();
 		StringBuilder sb = new StringBuilder();

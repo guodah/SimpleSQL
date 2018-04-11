@@ -3,6 +3,7 @@ package org.simplesql.relational_algebra;
 import java.io.OutputStream;
 import java.util.List;
 
+import org.simplesql.iterators.Row;
 import org.simplesql.resolve.SchemaResolver;
 
 public class InnerJoin extends Join{
@@ -40,7 +41,7 @@ public class InnerJoin extends Join{
 	}
 
 	@Override
-	public Table findColumn(String column, SchemaResolver resolver) {
+	public Table locateColumn(String column, SchemaResolver resolver) {
 		List<Column> columns = getColumns(resolver);
 		Table table = null;
 		for(Column each:columns){
@@ -55,4 +56,8 @@ public class InnerJoin extends Join{
 		return table;
 	}
 
+	public boolean evaluateJoinCondition(Row row1, Row row2){
+		Row superRow = Row.combine(row1, row2);
+		return this.joinCondition.evaluate(superRow);
+	}
 }

@@ -17,7 +17,7 @@ public class Row {
 	
 	public Row(String tableName, SchemaResolver resolver){
 		this();
-		this.tableName = tableName;
+		this.tableName = tableName.toUpperCase();
 		this.resolver = resolver;
 	}
 	
@@ -29,15 +29,33 @@ public class Row {
 		fieldName = fieldName.toUpperCase();
 		fields.put(fieldName, value);
 	}
+	
 	public long getFieldAsLong(String fieldName){
 		return ((LongValue)fields.get(fieldName)).evaluate(null);
 	}
+	
 	public double getFieldAsDouble(String fieldName){
 		return ((DoubleValue)fields.get(fieldName)).evaluate(null);
 	}
+	
+	protected LiteralValue<?> getValueWithoutTable(String column){
+		for(String each:fields.keySet()){
+			if(!each.contains(".")) continue;
+			
+			if(column.equals(each.substring(each.indexOf(".")+1))) {
+				return fields.get(each);
+			}
+		}
+		return null;
+	}
+	
 	public LiteralValue get(String fieldName){
 		fieldName = fieldName.toUpperCase();
-		return fields.get(fieldName);
+//		if(fields.containsKey(fieldName)){
+			return fields.get(fieldName);
+//		}else{
+//			return fields.get(tableName+"."+fieldName);
+//		}
 	}
 
 	public boolean containsField(String fieldName) {
@@ -52,8 +70,20 @@ public class Row {
 	public String toString(){
 		StringBuilder sb = new StringBuilder();
 		for(String key:fields.keySet()){
-			sb.append(String.format("(%s, %s", key, fields.get(key)));
+			sb.append(String.format("(%s, %s)", key, fields.get(key)));
 		}
 		return sb.toString();
+	}
+
+	public static Row combine(Row row1, Row row2) {
+		Row row = new Row();
+		for(String field:row1.fields.keySet()){
+			row.put(field, row1.fields.get(field));
+		}
+
+		for(String field:row2.fields.keySet()){
+			row.put(field, row2.fields.get(field));
+		}
+		return row;
 	}
 }
