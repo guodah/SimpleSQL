@@ -23,16 +23,14 @@ import static org.simplesql.relational_algebra.Utilities.parseTreeToRelAlg;
 public class Main {
 	public static void main(String args[]) throws IOException{
 		execute("schema/test.json", "sELECT testtableA.a, testtableB.b FROM testtableA "+
-				"inner join testtableB on testtableA.a=testtableB.a and testtableA.b=testtableB.b;");
+				"inner join testtableB on testtableA.a=testtableB.b and testtableA.b=testtableB.b;");
 
-//		execute("schema/test.json", "sELECT a, b, sum(c), count(*) FROM testtableA  natural join testtableB "+
-//				"where a>1 and b<5 GROUP BY a,b;");
+		execute("schema/test.json", "sELECT a, b, sum(c), count(*) FROM testtableA  natural join testtableB "+
+				"where a>1 and b>2 GROUP BY a,b;");
 
-//		execute("schema/test.json", "sELECT a, b,c,d,e,  g FROM testtableA natural join testtableB "+
-//				"natural join testtableC;");
+		execute("schema/test.json", "sELECT a, b,c,d,e,  g FROM testtableA natural join testtableB "+
+				"natural join testtableC where a>1;");
 
-//		execute("schema/test.json", "sELECT a, b,c,d,e FROM testtableA "+
-//				"natural join testtableB;");
 	}
 
 	private static void execute(String schemaPath, String sql) throws IOException {

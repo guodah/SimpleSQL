@@ -121,7 +121,7 @@ public class Utilities {
 	
 	private static String findOperator(ExprContext context) {
 		if(context.GT()!=null){
-			return ">=";
+			return ">";
 		}else if(context.LT()!=null){
 			return "<";
 		}else if(context.GTEQ()!=null){
