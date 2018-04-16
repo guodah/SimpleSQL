@@ -8,10 +8,10 @@ import java.util.List;
 import org.simplesql.resolve.SchemaResolver;
 
 
-public class Project {
+public class Project extends Relation{
 	private List<Column> columns;
 	private Filter filter;
-	private DataSource dataSource;
+	private Relation relation;
 	private List<Aggregate> aggregates;
 	private GroupBy groupBy;
 	
@@ -33,8 +33,8 @@ public class Project {
 		columns.add(column);
 	}
 	
-	public void setDataSource(DataSource dataSource){
-		this.dataSource = dataSource;
+	public void setRelation(Relation relation){
+		this.relation = relation;
 	}
 	
 	public void setFilter(Filter filter){
@@ -47,7 +47,7 @@ public class Project {
 	
 	public String toString(){
 		StringBuilder sb = new StringBuilder();
-		sb.append("SELECT ");
+		sb.append("(SELECT ");
 		for(int i=0;i<columns.size();i++){
 			sb.append(columns.get(i));
 			if(i!=columns.size()-1){
@@ -67,7 +67,7 @@ public class Project {
 		}
 		
 		sb.append(" FROM ");
-		sb.append(dataSource);
+		sb.append(relation);
 		if(filter!=null){
 			sb.append(filter);
 		}
@@ -75,12 +75,12 @@ public class Project {
 		if(this.groupBy!=null){
 			sb.append(" "+groupBy);
 		}
-		sb.append(";");
+		sb.append(")");
 		return sb.toString();
 	}
 
-	public DataSource getDataSource() {
-		return dataSource;
+	public Relation getRelation() {
+		return relation;
 	}
 
 	public Filter getFilter() {
@@ -95,34 +95,44 @@ public class Project {
 		return aggregates;
 	}
 
-	public DataSource getTable(String table) {
-		return dataSource.findTable(table);
+	public Relation getTable(String table) {
+		return relation.findTable(table);
 	}
 	
 	public boolean resolve(SchemaResolver resolver, OutputStream output){
 		boolean result = true;
 		
 		// resolve the data source
-		result = result && dataSource.resolve(resolver, output);
+		result = result && relation.resolve(resolver, output);
 		
 		// resolve the where clause
 		if(filter!=null){
-			result = result && filter.resolve(dataSource, resolver, output);
+			result = result && filter.resolve(relation, resolver, output);
 		}
 		
 		// resolve the project columns
 		for(Column column:columns){
-			result = result && column.resolve(dataSource, resolver, output);
+			result = result && column.resolve(relation, resolver, output);
 		}
 		
 		// resolve the group by clause
-		result = result && (groupBy==null || groupBy.resolve(dataSource, resolver, output));
+		result = result && (groupBy==null || groupBy.resolve(relation, resolver, output));
 		
 		// resolve the aggregate functions
 		for(Aggregate aggregate:aggregates){
-			result = result && aggregate.resolve(dataSource, resolver, output);
+			result = result && aggregate.resolve(relation, resolver, output);
 		}
 		return result;
+	}
+
+	@Override
+	public List<Column> getColumns(SchemaResolver resolver) {
+		return this.getColumns();
+	}
+
+	@Override
+	public Table locateColumn(String column, SchemaResolver resolver) {
+		return this.relation.locateColumn(column, resolver);
 	}
 
 }

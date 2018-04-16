@@ -7,7 +7,7 @@ import org.simplesql.resolve.SchemaResolver;
 
 public class NaturalJoin extends Join{
 
-	public NaturalJoin(DataSource left, DataSource right) {
+	public NaturalJoin(Relation left, Relation right) {
 		super(left, right);
 	}
 

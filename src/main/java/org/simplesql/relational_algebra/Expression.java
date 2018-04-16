@@ -23,7 +23,7 @@ public abstract class Expression <T>{
 	
 	abstract public T evaluate(Row ctx);
 	
-	abstract public boolean resolve(DataSource dataSource, SchemaResolver resolver, OutputStream output);
+	abstract public boolean resolve(Relation dataSource, SchemaResolver resolver, OutputStream output);
 
 	abstract public String getType(SchemaResolver resolver);
 	

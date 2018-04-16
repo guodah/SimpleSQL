@@ -22,15 +22,20 @@ import static org.simplesql.relational_algebra.Utilities.parseTreeToRelAlg;
 
 public class Main {
 	public static void main(String args[]) throws IOException{
-		execute("schema/test.json", "sELECT testtableA.a, testtableB.b FROM testtableA "+
-				"inner join testtableB on testtableA.a=testtableB.b and testtableA.b=testtableB.b;");
 
-		execute("schema/test.json", "sELECT a, b, sum(c), count(*) FROM testtableA  natural join testtableB "+
-				"where a>1 and b>2 GROUP BY a,b;");
+//		execute("schema/test.json", "sELECT testtableA.a, testtableB.b FROM testtableA "+
+//				"inner join testtableB on testtableA.a=testtableB.b and testtableA.b=testtableB.b;");
+
+//		execute("schema/test.json", "sELECT a, b, sum(c), count(*) FROM testtableA  natural join testtableB "+
+//				"where a>1 and b>2 GROUP BY a,b;");
 
 		execute("schema/test.json", "sELECT a, b,c,d,e,  g FROM testtableA natural join testtableB "+
-				"natural join testtableC where a>1;");
+				"natural join testtableC where b>3;");
+		
+		execute("schema/test.json", "sELECT a, b,c,d,e,  g FROM (select a, b,c,d from testtablea) natural join testtableB "+
+				"natural join testtableC where b>3;");
 
+//		execute("schema/test.json", "sELECT a, b,c,d  FROM (select a, b,c,d from testtablea)");
 	}
 
 	private static void execute(String schemaPath, String sql) throws IOException {
@@ -43,7 +48,7 @@ public class Main {
 		System.out.println(project);
 		
 		SchemaResolver resolver = new SchemaResolver(new File(schemaPath).toURI().toURL());
-		ProjectIterator projectIterator = IteratorBuilder.buildCSVProjectIterator(project, resolver, false);
+		ProjectIterator projectIterator = IteratorBuilder.buildRelationIterator(project, resolver, false);
 		print(projectIterator);				
 	}
 	private static void print(ProjectIterator projectIterator) {

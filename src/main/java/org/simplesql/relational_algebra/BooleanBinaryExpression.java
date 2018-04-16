@@ -53,7 +53,7 @@ public class BooleanBinaryExpression extends Expression <Boolean>{
 	}
 
 	@Override
-	public boolean resolve(DataSource dataSource, SchemaResolver resolver, OutputStream output) {
+	public boolean resolve(Relation dataSource, SchemaResolver resolver, OutputStream output) {
 		boolean leftResult = left.resolve(dataSource, resolver, output);
 		boolean rightResult = right.resolve(dataSource, resolver, output);
 	

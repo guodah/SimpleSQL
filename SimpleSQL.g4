@@ -5,14 +5,15 @@ grammar SimpleSQL;
 }
 
 // root rule
-parse : SELECT columns FROM data_source (WHERE expr)? (group_by)? ';'; 
+parse : SELECT columns FROM relation (WHERE expr)? (group_by)? ';'?; 
 
 columns: column (',' column)*;
 column: function | table_column | ANY_NAME;
 
-data_source:
+relation:
 	table_name
-	| data_source join_operator data_source (join_condition)?
+	| '(' parse ')'
+	| relation join_operator relation (join_condition)?
 	;
 
 join_condition: ON expr;

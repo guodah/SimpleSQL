@@ -5,12 +5,12 @@ import java.util.List;
 
 import org.simplesql.resolve.SchemaResolver;
 
-abstract public class Join extends DataSource{
+abstract public class Join extends Relation{
 
-	protected DataSource left;
-	protected DataSource right;
+	protected Relation left;
+	protected Relation right;
 	
-	public Join(DataSource left, DataSource right){
+	public Join(Relation left, Relation right){
 		this.left = left;
 		this.right = right;
 	}
@@ -20,7 +20,7 @@ abstract public class Join extends DataSource{
 		return left.resolve(resolver, output) && right.resolve(resolver, output);
 	}
 	
-	public static Join defineJoin(DataSource left, DataSource right, String joinMethod, BooleanBinaryExpression expression){
+	public static Join defineJoin(Relation left, Relation right, String joinMethod, BooleanBinaryExpression expression){
 		joinMethod = joinMethod.toUpperCase();
 		if(joinMethod.equals("NATURAL")){
 			return new NaturalJoin(left, right);
@@ -31,11 +31,11 @@ abstract public class Join extends DataSource{
 		}
 	}
 	
-	public DataSource getLeft(){
+	public Relation getLeft(){
 		return left;
 	}
 	
-	public DataSource getRight(){
+	public Relation getRight(){
 		return right;
 	}
 	

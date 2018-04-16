@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.simplesql.resolve.SchemaResolver;
 
-public abstract class DataSource {
+public abstract class Relation {
 	abstract public boolean resolve(SchemaResolver resolver, OutputStream output);
 	abstract public List<Column> getColumns(SchemaResolver resolver);
 	
@@ -14,7 +14,7 @@ public abstract class DataSource {
 		return findTable(this, table);
 	}
 	
-	private Table findTable(DataSource dataSource, String table) {
+	private Table findTable(Relation dataSource, String table) {
 		if(dataSource instanceof Table){
 			if(dataSource.toString().equals(table)){
 				return (Table)dataSource;

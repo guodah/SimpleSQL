@@ -21,8 +21,10 @@ This is a project for me to experience the process of **parsing**, **compiling**
 
 **April 11, 2018**: Added code for natural join based on sorting and inner join with join condition based on nested loops.
 
+**April 16, 2018**: Added code for basic uncorrelated subqueries. 
+
 **plan**:
 * add count distinct
 * expression, such as x+5>y+4
-* subqueries
+* subqueries with naming such as "select a from (select a from b where c>3) temp1 inner join (select a from b where c>10) temp2 on temp1.a=temp2.a"
 

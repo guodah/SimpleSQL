@@ -54,13 +54,13 @@ public class SimpleSQLBaseListener implements SimpleSQLListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterData_source(SimpleSQLParser.Data_sourceContext ctx) { }
+	@Override public void enterRelation(SimpleSQLParser.RelationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitData_source(SimpleSQLParser.Data_sourceContext ctx) { }
+	@Override public void exitRelation(SimpleSQLParser.RelationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

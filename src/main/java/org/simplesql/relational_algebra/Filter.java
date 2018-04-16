@@ -32,7 +32,7 @@ public class Filter {
 		return expression.evaluate(row);
 	}
 	
-	public boolean resolve(DataSource dataSource, SchemaResolver resolver, OutputStream output){
+	public boolean resolve(Relation dataSource, SchemaResolver resolver, OutputStream output){
 		return expression.resolve(dataSource, resolver, output);
 	}
 }

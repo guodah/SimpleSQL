@@ -3,45 +3,45 @@ package org.simplesql.relational_algebra;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Formatter;
 import java.util.List;
-
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.simplesql.iterators.IteratorBuilder;
 import org.simplesql.iterators.ProjectIterator;
 import org.simplesql.iterators.Row;
 import org.simplesql.parse.SimpleSQLLexer;
 import org.simplesql.parse.SimpleSQLParser;
 import org.simplesql.parse.SimpleSQLParser.ColumnContext;
-import org.simplesql.parse.SimpleSQLParser.Data_sourceContext;
 import org.simplesql.parse.SimpleSQLParser.ExprContext;
 import org.simplesql.parse.SimpleSQLParser.Literal_valueContext;
 import org.simplesql.parse.SimpleSQLParser.ParseContext;
+import org.simplesql.parse.SimpleSQLParser.RelationContext;
 import org.simplesql.resolve.SchemaResolver;
 
 public class Utilities {
 	public static Project parseTreeToRelAlg(SimpleSQLParser parser, URL schema) throws MalformedURLException, IOException{
 		ParseContext tree = parser.parse();
+		SchemaResolver resolver = new SchemaResolver(schema);
+		return findProject(tree, resolver);
+	}
+
+	private static Project findProject(ParseContext tree,SchemaResolver resolver){
 		Project project = new Project();
-		findDataSource(project, tree);
+		findDataSource(project, tree, resolver);
 		findFilter(project, tree);
 		findColumns(project, tree);
-		
 		findAggregates(project, tree);
 		findGroupBy(project, tree);
 				
-		if(!project.resolve(new SchemaResolver(schema), System.out)){
+		if(!project.resolve(resolver, System.out)){
 			return null;
 		}else{
 			return project;
 		}
+		
 	}
-	
 
 	private static void findGroupBy(Project project, ParseContext tree) {
 		if(tree.group_by()==null) return;
@@ -168,34 +168,36 @@ public class Utilities {
 		}
 	}
 	
-	private static void findDataSource(Project project, ParseContext tree){
-		DataSource dataSource = findDataSource(tree.data_source());
-		project.setDataSource(dataSource);
+	private static void findDataSource(Project project, ParseContext tree, SchemaResolver resolver){
+		Relation dataSource = findDataSource(tree.relation(), resolver);
+		project.setRelation(dataSource);
 	}
 	
-	private static DataSource findDataSource(Data_sourceContext data_sourceContext) {
-		if(data_sourceContext.table_name()!=null){
-			return new Table(data_sourceContext.table_name().getText());
-		}else if(data_sourceContext.join_operator()!=null){
-			List<Data_sourceContext> dataSources = data_sourceContext.data_source();
-			DataSource left = findDataSource( dataSources.get(0));
-			DataSource right = findDataSource( dataSources.get(1));
+	private static Relation findDataSource(RelationContext relationContext, SchemaResolver resolver) {
+		if(relationContext.table_name()!=null){
+			return new Table(relationContext.table_name().getText());
+		}else if(relationContext.join_operator()!=null){
+			List<RelationContext> dataSources = relationContext.relation();
+			Relation left = findDataSource( dataSources.get(0), resolver);
+			Relation right = findDataSource( dataSources.get(1), resolver);
 			
 			Expression<?> joinCondition = null;
-			if(data_sourceContext.join_condition()!=null){
-				joinCondition = findExpression(data_sourceContext.join_condition().expr());
+			if(relationContext.join_condition()!=null){
+				joinCondition = findExpression(relationContext.join_condition().expr());
 			}
 
-			String joinType = data_sourceContext.join_operator().join_type().getText(); 
+			String joinType = relationContext.join_operator().join_type().getText(); 
 			if(joinType.equals("NATURAL") || joinType.equals("INNER") && 
 					joinCondition instanceof BooleanBinaryExpression){
-				return Join.defineJoin(left, right, data_sourceContext.join_operator().join_type().getText(), 
+				return Join.defineJoin(left, right, relationContext.join_operator().join_type().getText(), 
 						(BooleanBinaryExpression)joinCondition);
 			}else{
 				throw new IllegalStateException("unsupported join condition");
 			}
+		}else if(relationContext.parse()!=null){
+			return findProject(relationContext.parse(), resolver);
 		}else{
-			throw new IllegalStateException("unsupported data source: "+data_sourceContext.getText());
+			throw new IllegalStateException("unsupported data source: "+relationContext.getText());
 		}
 	}
 

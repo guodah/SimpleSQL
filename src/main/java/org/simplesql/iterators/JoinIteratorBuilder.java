@@ -1,6 +1,6 @@
 package org.simplesql.iterators;
 
-import org.simplesql.relational_algebra.DataSource;
+import org.simplesql.relational_algebra.Relation;
 import org.simplesql.relational_algebra.InnerJoin;
 import org.simplesql.relational_algebra.Join;
 import org.simplesql.relational_algebra.NaturalJoin;

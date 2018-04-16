@@ -40,15 +40,15 @@ public interface SimpleSQLListener extends ParseTreeListener {
 	 */
 	void exitColumn(SimpleSQLParser.ColumnContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link SimpleSQLParser#data_source}.
+	 * Enter a parse tree produced by {@link SimpleSQLParser#relation}.
 	 * @param ctx the parse tree
 	 */
-	void enterData_source(SimpleSQLParser.Data_sourceContext ctx);
+	void enterRelation(SimpleSQLParser.RelationContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link SimpleSQLParser#data_source}.
+	 * Exit a parse tree produced by {@link SimpleSQLParser#relation}.
 	 * @param ctx the parse tree
 	 */
-	void exitData_source(SimpleSQLParser.Data_sourceContext ctx);
+	void exitRelation(SimpleSQLParser.RelationContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link SimpleSQLParser#join_condition}.
 	 * @param ctx the parse tree

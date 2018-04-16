@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.simplesql.resolve.SchemaResolver;
 
-public class Table extends DataSource{
+public class Table extends Relation{
 	private String tableName;
 	public Table(String tableName){
 		this.tableName = tableName;

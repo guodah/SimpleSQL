@@ -36,7 +36,7 @@ public class AggregateCount extends Aggregate {
 	}
 
 	@Override
-	public boolean resolve(DataSource dataSource, SchemaResolver resolver, OutputStream output) {
+	public boolean resolve(Relation dataSource, SchemaResolver resolver, OutputStream output) {
 		return true;
 	}
 }

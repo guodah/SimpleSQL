@@ -21,7 +21,7 @@ public abstract class LiteralValue<T extends Comparable<T>> extends Expression<C
 		return isNull?"null":"";
 	}
 	
-	public boolean resolve(DataSource dataSource, SchemaResolver resolver, OutputStream output){
+	public boolean resolve(Relation dataSource, SchemaResolver resolver, OutputStream output){
 		return true;
 	}
 }

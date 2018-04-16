@@ -2,17 +2,13 @@ package org.simplesql.main;
 
 import static org.junit.Assert.*;
 import static org.simplesql.relational_algebra.Utilities.parseTreeToRelAlg;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
-
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -58,6 +54,16 @@ public class TestMain {
 		assertEquals(result.size(), 1);
 		assertTrue(result.contains("{TESTTABLEA.A=2, TESTTABLEA.B=4, TESTTABLEA.C=5, TESTTABLEA.D=10, TESTTABLEB.E=10, TESTTABLEC.G=5}"));
 	}
+
+	@Test
+	public void testSubqueryWithNaturalJoin() throws IOException{
+		List<String> result = execute("sELECT a, b,c,d,e,  g FROM (select a, b,c,d from testtablea) natural join testtableB "+
+				"natural join testtableC where b>3;");
+
+		assertNotNull(result);
+		assertEquals(result.size(), 1);
+		assertTrue(result.contains("{TESTTABLEA.A=2, TESTTABLEA.B=4, TESTTABLEA.C=5, TESTTABLEA.D=10, TESTTABLEB.E=10, TESTTABLEC.G=5}"));
+	}
 	
 	@Test
 	public void testGroupBy() throws IOException{
@@ -67,6 +73,22 @@ public class TestMain {
 		assertEquals(result.size(),2);
 		assertTrue(result.contains("{COUNT(*)=4, SUM(TESTTABLEA.C)=24, TESTTABLEA.A=2, TESTTABLEA.B=3}"));
 		assertTrue(result.contains("{COUNT(*)=1, SUM(TESTTABLEA.C)=5, TESTTABLEA.A=2, TESTTABLEA.B=4}"));
+	}
+
+	@Test
+	public void testSubqueryNoJoin() throws IOException{
+		List<String> result = execute("sELECT a, b,c,d  FROM (select a, b,c,d from testtablea);");
+		
+		assertNotNull(result);
+		assertEquals(result.size(), 7);
+		
+		assertTrue(result.contains("{TESTTABLEA.A=1, TESTTABLEA.B=1, TESTTABLEA.C=2, TESTTABLEA.D=4}"));
+		assertTrue(result.contains("{TESTTABLEA.A=1, TESTTABLEA.B=1, TESTTABLEA.C=4, TESTTABLEA.D=2}"));
+		assertTrue(result.contains("{TESTTABLEA.A=1, TESTTABLEA.B=2, TESTTABLEA.C=3, TESTTABLEA.D=6}"));
+		assertTrue(result.contains("{TESTTABLEA.A=1, TESTTABLEA.B=2, TESTTABLEA.C=6, TESTTABLEA.D=3}"));	
+		assertTrue(result.contains("{TESTTABLEA.A=2, TESTTABLEA.B=3, TESTTABLEA.C=4, TESTTABLEA.D=8}"));
+		assertTrue(result.contains("{TESTTABLEA.A=2, TESTTABLEA.B=3, TESTTABLEA.C=8, TESTTABLEA.D=4}"));
+		assertTrue(result.contains("{TESTTABLEA.A=2, TESTTABLEA.B=4, TESTTABLEA.C=5, TESTTABLEA.D=10}"));
 	}
 	
 	private List<String> execute(String sql) throws IOException {
@@ -78,7 +100,7 @@ public class TestMain {
 		Project project = parseTreeToRelAlg(parser, new File(SCHEMA).toURI().toURL());
 
 		SchemaResolver resolver = new SchemaResolver(new File(SCHEMA).toURI().toURL());
-		ProjectIterator projectIterator = IteratorBuilder.buildCSVProjectIterator(project, resolver, false);
+		ProjectIterator projectIterator = IteratorBuilder.buildRelationIterator(project, resolver, false);
 		return buildSet(projectIterator);
 	}
 

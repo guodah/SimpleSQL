@@ -10,7 +10,7 @@ public class InnerJoin extends Join{
 	private BooleanBinaryExpression joinCondition;
 
 
-	public InnerJoin(DataSource left, DataSource right, BooleanBinaryExpression joinCondition) {
+	public InnerJoin(Relation left, Relation right, BooleanBinaryExpression joinCondition) {
 		super(left, right);
 		this.joinCondition = joinCondition;
 		

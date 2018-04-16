@@ -36,7 +36,7 @@ public class Column extends Expression<String>{
 	// 2. If the column does not specify a table, check data source contains a table that contains
 	//    the column exclusively, then bind the column to that table
 	@Override
-	public boolean resolve(DataSource dataSource, SchemaResolver resolver, OutputStream output) {
+	public boolean resolve(Relation dataSource, SchemaResolver resolver, OutputStream output) {
 		if(resolved) return true;
 		
 		if(tableName!=null){

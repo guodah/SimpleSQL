@@ -34,7 +34,7 @@ public class GroupBy {
 		return columns;
 	}
 	
-	public boolean resolve(DataSource dataSource, SchemaResolver resolver, OutputStream output){
+	public boolean resolve(Relation dataSource, SchemaResolver resolver, OutputStream output){
 		for(Column column:columns){
 			if(!column.resolve(dataSource, resolver, output)){
 				return false;
