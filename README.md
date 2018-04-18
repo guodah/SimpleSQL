@@ -23,8 +23,8 @@ This is a project for me to experience the process of **parsing**, **compiling**
 
 **April 16, 2018**: Added code for basic uncorrelated subqueries. 
 
+**April 18, 2018**: Added code for supporting expressions as columns, like "select a+1, b*2+c, c+d from testtablea"
+
 **plan**:
 * add count distinct
-* expression, such as x+5>y+4
-* subqueries with naming such as "select a from (select a from b where c>3) temp1 inner join (select a from b where c>10) temp2 on temp1.a=temp2.a"
-
+* add outer join, semi join
