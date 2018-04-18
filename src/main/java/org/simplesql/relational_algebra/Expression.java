@@ -39,8 +39,8 @@ public abstract class Expression <T>{
 	}
 	
 	public static int compare(Expression<?> left, Expression<?> right, Row ctx) {
-		Object leftValue = getLiteral(left, ctx);
-		Object rightValue = getLiteral(right, ctx);
+		Object leftValue = getValue(left, ctx);
+		Object rightValue = getValue(right, ctx);
 		
 		if(leftValue==null && rightValue==null){
 			return 0;
@@ -73,7 +73,8 @@ public abstract class Expression <T>{
 		return obj1.getClass().equals(obj2.getClass());
 	}
 	
-	private static Object getLiteral(Expression<?> expr, Row ctx){
+	private static Object getValue(Expression<?> expr, Row ctx){
+/*
 		// both left and right should be either a literal or a column
 		if(!isLiteralOrColumn(expr)){
 			throw new IllegalStateException(
@@ -82,18 +83,23 @@ public abstract class Expression <T>{
 
 		Object value = null;
 		if(expr instanceof Column){
-			value = ctx.get(expr.getFullName()).evaluate(null);
+			
+//			value = ctx.get(expr.getFullName()).evaluate(null);
+			value = expr.evaluate(ctx);
 		}else{
-			value = ((LiteralValue)expr).evaluate(null);
+//			value = ((LiteralValue)expr).evaluate(null);
+			value = expr.evaluate(ctx);
 		}
 		return value;
+*/
+		Object value = expr.evaluate(ctx);
+		if(value instanceof LiteralValue<?>){
+			return ((LiteralValue) value).evaluate(ctx);
+		}else{
+			return value;
+		}
 	}
 	
-	
-	
-	private static boolean isLiteralOrColumn(Expression<?> expr) {
-		return (expr instanceof LiteralValue) || (expr instanceof Column);
-	}
 
 	abstract public boolean isNumeric();
 

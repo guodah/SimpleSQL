@@ -23,7 +23,7 @@ public class NumericBinaryExpression extends BinaryExpression <LiteralValue<?>>{
 	public LiteralValue<?> evaluate(Row ctx) {
 		NumericValue<?> leftValue = wrap(left.evaluate(ctx));
 		NumericValue<?> rightValue = wrap(right.evaluate(ctx));
-		return NumericValue.perform(operator, (NumericValue<?>)leftValue, (NumericValue<?>)rightValue);
+		return perform(operator, (NumericValue<?>)leftValue, (NumericValue<?>)rightValue);
 	}
 
 	private NumericValue<?> wrap(Object value) {
@@ -90,5 +90,47 @@ public class NumericBinaryExpression extends BinaryExpression <LiteralValue<?>>{
 		return false;
 	}
 	
-	
+	public static NumericValue perform(String operator, NumericValue left, NumericValue right){
+		if(operator.equals("+")){
+			return add(left, right);
+		}else if(operator.equals("-")){
+			return subtract(left, right);
+		}else if(operator.equals("*")){
+			return multiply(left, right);
+		}else if(operator.equals("/")){
+			return divide(left, right);
+		}else{
+			throw new IllegalStateException("unregconized operator: " + operator);
+		}
+	}
+
+	private static NumericValue add(NumericValue left, NumericValue right) {
+		if(left instanceof DoubleValue || right instanceof DoubleValue){
+			return new DoubleValue((Double)(left.evaluate(null))+((Double)right.evaluate(null)));
+		}else{
+			return new LongValue(((Long)left.evaluate(null))+((Long)right.evaluate(null)));
+		}
+	}
+	private static NumericValue subtract(NumericValue left, NumericValue right) {
+		if(left instanceof DoubleValue || right instanceof DoubleValue){
+			return new DoubleValue((Double)(left.evaluate(null))-((Double)right.evaluate(null)));
+		}else{
+			return new LongValue(((Long)left.evaluate(null))-((Long)right.evaluate(null)));
+		}
+	}
+	private static NumericValue multiply(NumericValue left, NumericValue right) {
+		if(left instanceof DoubleValue || right instanceof DoubleValue){
+			return new DoubleValue((Double)(left.evaluate(null))*((Double)right.evaluate(null)));
+		}else{
+			return new LongValue(((Long)left.evaluate(null))*((Long)right.evaluate(null)));
+		}
+	}
+	private static NumericValue divide(NumericValue left, NumericValue right) {
+		if(left instanceof DoubleValue || right instanceof DoubleValue){
+			return new DoubleValue((Double)(left.evaluate(null))/((Double)right.evaluate(null)));
+		}else{
+			return new LongValue(((Long)left.evaluate(null))/((Long)right.evaluate(null)));
+		}
+	}
+
 }

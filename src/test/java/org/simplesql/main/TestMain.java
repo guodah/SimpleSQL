@@ -115,6 +115,15 @@ public class TestMain {
 		assertTrue(result.contains("{TESTTABLEA.A + 1=3, TESTTABLEA.B * 2 + TESTTABLEA.C=13, TESTTABLEA.C + TESTTABLEA.D=15}"));
 	}
 	
+	@Test 
+	public void testNumericExpressionInFilter()throws IOException{
+		List<String> result = execute("select a+1, b*2+c, c+d from testtablea where a+3>=2*d-1");
+		System.out.println(result);
+		assertNotNull(result);
+		assertEquals(result.size(), 1);
+		assertTrue(result.contains("{TESTTABLEA.A + 1=2, TESTTABLEA.B * 2 + TESTTABLEA.C=6, TESTTABLEA.C + TESTTABLEA.D=6}"));
+	}
+	
 	private List<String> execute(String sql) throws IOException {
 		CharStream input = CharStreams.fromStream(new ByteArrayInputStream(sql.toUpperCase().getBytes()));
 		SimpleSQLLexer lexer = new SimpleSQLLexer(input);
