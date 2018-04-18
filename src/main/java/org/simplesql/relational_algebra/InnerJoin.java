@@ -26,13 +26,13 @@ public class InnerJoin extends Join{
 	@Override
 	public boolean resolve(SchemaResolver resolver, OutputStream output) {
 		return super.resolve(resolver, output) 
-				&& joinCondition.resolve(this, resolver, output); 
+				&& joinCondition.resolve(this, output); 
 	}
 
 	@Override
-	public List<Column> getColumns(SchemaResolver resolver) {
-		List<Column> columns = left.getColumns(resolver);
-		columns.addAll(right.getColumns(resolver));
+	public List<Expression<?>> getColumns() {
+		List<Expression<?>> columns = left.getColumns();
+		columns.addAll(right.getColumns());
 		return columns;
 	}
 	
@@ -41,16 +41,17 @@ public class InnerJoin extends Join{
 	}
 
 	@Override
-	public Table locateColumn(String column, SchemaResolver resolver) {
-		List<Column> columns = getColumns(resolver);
+	public Table locateColumn(String column) {
+		List<Expression<?>> columns = getColumns();
 		Table table = null;
-		for(Column each:columns){
-			if(each.getColumn().equals(column)){
-				if(table!=null){
+		for(Expression<?> each:columns){
+			Table temp = each.locateColumn(column);
+			if(table!=null){
+				if(temp!=null){
 					return null;
-				}else{
-					table = new Table(each.getTableName());
 				}
+			}else{
+				table = temp;
 			}
 		}
 		return table;

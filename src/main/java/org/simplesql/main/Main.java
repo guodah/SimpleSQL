@@ -9,6 +9,7 @@ import java.util.List;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.simplesql.SimpleSQL;
 import org.simplesql.iterators.IteratorBuilder;
 import org.simplesql.iterators.ProjectIterator;
 import org.simplesql.iterators.Row;
@@ -16,6 +17,7 @@ import org.simplesql.parse.SimpleSQLLexer;
 import org.simplesql.parse.SimpleSQLParser;
 import org.simplesql.relational_algebra.Aggregate;
 import org.simplesql.relational_algebra.Column;
+import org.simplesql.relational_algebra.Expression;
 import org.simplesql.relational_algebra.Project;
 import org.simplesql.resolve.SchemaResolver;
 import static org.simplesql.relational_algebra.Utilities.parseTreeToRelAlg;
@@ -23,19 +25,28 @@ import static org.simplesql.relational_algebra.Utilities.parseTreeToRelAlg;
 public class Main {
 	public static void main(String args[]) throws IOException{
 
+		SimpleSQL.setSchema(new File("schema/test.json").toURI().toURL());
+		
+//		execute("schema/test.json", "select a, b,c,d from testtablea where a>=2 and c<=5");
+//		execute("schema/test.json", "select a, b,count(*), sum(c) from testtablea group by a, b");
+		
 //		execute("schema/test.json", "sELECT testtableA.a, testtableB.b FROM testtableA "+
 //				"inner join testtableB on testtableA.a=testtableB.b and testtableA.b=testtableB.b;");
 
+//		execute("schema/test.json", "sELECT a, b FROM testtableA  natural join testtableB ");
+		
 //		execute("schema/test.json", "sELECT a, b, sum(c), count(*) FROM testtableA  natural join testtableB "+
 //				"where a>1 and b>2 GROUP BY a,b;");
 
-		execute("schema/test.json", "sELECT a, b,c,d,e,  g FROM testtableA natural join testtableB "+
-				"natural join testtableC where b>3;");
+//		execute("schema/test.json", "sELECT a, b,c,d,e,  g FROM testtableA natural join testtableB "+
+//				"natural join testtableC where b>3;");
 		
-		execute("schema/test.json", "sELECT a, b,c,d,e,  g FROM (select a, b,c,d from testtablea) natural join testtableB "+
-				"natural join testtableC where b>3;");
+//		execute("schema/test.json", "sELECT a, b,c,d,e,  g FROM (select a, b,c,d from testtablea) natural join testtableB "+
+//				"natural join testtableC where b>3;");
 
 //		execute("schema/test.json", "sELECT a, b,c,d  FROM (select a, b,c,d from testtablea)");
+		
+		execute("schema/test.json", "select a+1, b*2+c, c+d from testtablea");
 	}
 
 	private static void execute(String schemaPath, String sql) throws IOException {
@@ -44,17 +55,16 @@ public class Main {
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		SimpleSQLParser parser = new SimpleSQLParser(tokens);
 
-		Project project = parseTreeToRelAlg(parser, new File(schemaPath).toURI().toURL());
+		Project project = parseTreeToRelAlg(parser);
 		System.out.println(project);
 		
-		SchemaResolver resolver = new SchemaResolver(new File(schemaPath).toURI().toURL());
-		ProjectIterator projectIterator = IteratorBuilder.buildRelationIterator(project, resolver, false);
+		ProjectIterator projectIterator = IteratorBuilder.buildRelationIterator(project, false);
 		print(projectIterator);				
 	}
 	private static void print(ProjectIterator projectIterator) {
-		List<Column> columns = projectIterator.getColumns();
+		List<Expression<?>> columns = projectIterator.getColumns();
 		StringBuilder sb = new StringBuilder();
-		for(Column each:columns){
+		for(Expression each:columns){
 			sb.append(each.toString()+"\t");
 		}
 		if(projectIterator.getAggregates()!=null){
@@ -66,7 +76,7 @@ public class Main {
 		while(projectIterator.hasNext()){
 			sb = new StringBuilder();
 			Row row = projectIterator.next();
-			for(Column each:columns){
+			for(Expression each:columns){
 				sb.append(row.get(each.toString())+"\t");
 			}		
 			if(projectIterator.getAggregates()!=null){

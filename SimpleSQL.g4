@@ -7,8 +7,8 @@ grammar SimpleSQL;
 // root rule
 parse : SELECT columns FROM relation (WHERE expr)? (group_by)? ';'?; 
 
-columns: column (',' column)*;
-column: function | table_column | ANY_NAME;
+columns: expr (',' expr)*;
+
 
 relation:
 	table_name
@@ -29,12 +29,22 @@ join_type: NATURAL | INNER;
 expr: 
      literal_value  
    | column
-   | expr (GTEQ | NEQ | EQ | GT | LTEQ | LT | IS ) expr
+   | expr mul_div expr
+   | expr add_sub expr
+   | expr compare_operator expr
    | expr AND expr
    | expr OR expr
    | function
-   | WILDCARD
+   | '*'
    ;
+
+add_sub: ADD | SUB;
+
+mul_div: MUL | DIV;
+
+compare_operator: GTEQ | NEQ | EQ | GT | LTEQ | LT | IS ;
+
+column: table_column | ANY_NAME;
 
 function: function_name ('(' expr (',' expr)* ')') | ('(' ')');
 
@@ -67,7 +77,13 @@ LTEQ: '<=';
 LT: '<';
 GTEQ: '>=';
 GT: '>';
-WILDCARD: '*';
+
+ADD : '+';
+SUB : '-';
+MUL : '*';
+DIV : '/';
+
+
 
 ON: O N;
 NATURAL: N A T U R A L;

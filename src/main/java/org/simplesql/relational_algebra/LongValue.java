@@ -5,10 +5,12 @@ import java.io.OutputStream;
 import org.simplesql.iterators.Row;
 import org.simplesql.resolve.SchemaResolver;
 
-public class LongValue extends LiteralValue<Long>{
+public class LongValue extends NumericValue<Long>{
+	
+	public static final LongValue ZERO = new LongValue(0L);
+	
 	private long val;
 	public LongValue(long val){
-		super(false);
 		this.val = val;
 	}
 	
@@ -21,7 +23,7 @@ public class LongValue extends LiteralValue<Long>{
 		return val;
 	}
 	@Override
-	public String getType(SchemaResolver resolver) {
+	public String getType() {
 		return "LONG";
 	}
 
@@ -38,4 +40,5 @@ public class LongValue extends LiteralValue<Long>{
 		else
 			return false;
 	}
+
 }

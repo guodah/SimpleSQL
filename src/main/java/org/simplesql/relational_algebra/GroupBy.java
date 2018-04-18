@@ -36,13 +36,13 @@ public class GroupBy {
 	
 	public boolean resolve(Relation dataSource, SchemaResolver resolver, OutputStream output){
 		for(Column column:columns){
-			if(!column.resolve(dataSource, resolver, output)){
+			if(!column.resolve(dataSource, output)){
 				return false;
 			}
 		}
 		
 		for(Aggregate aggregate:aggregates){
-			if(!aggregate.resolve(dataSource, resolver, output)){
+			if(!aggregate.resolve(dataSource, output)){
 				return false;
 			}
 		}

@@ -42,18 +42,6 @@ public class SimpleSQLBaseListener implements SimpleSQLListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterColumn(SimpleSQLParser.ColumnContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitColumn(SimpleSQLParser.ColumnContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterRelation(SimpleSQLParser.RelationContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -133,6 +121,54 @@ public class SimpleSQLBaseListener implements SimpleSQLListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitExpr(SimpleSQLParser.ExprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterAdd_sub(SimpleSQLParser.Add_subContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitAdd_sub(SimpleSQLParser.Add_subContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterMul_div(SimpleSQLParser.Mul_divContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitMul_div(SimpleSQLParser.Mul_divContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterCompare_operator(SimpleSQLParser.Compare_operatorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCompare_operator(SimpleSQLParser.Compare_operatorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterColumn(SimpleSQLParser.ColumnContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitColumn(SimpleSQLParser.ColumnContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

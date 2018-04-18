@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URL;
 
 import org.simplesql.relational_algebra.Relation;
+import org.simplesql.SimpleSQL;
 import org.simplesql.relational_algebra.Join;
 import org.simplesql.relational_algebra.NaturalJoin;
 import org.simplesql.relational_algebra.Project;
@@ -14,9 +15,9 @@ import org.simplesql.resolve.SchemaResolver;
 public class IteratorBuilder {
 
 	
-	public static ProjectIterator buildRelationIterator(Project project, SchemaResolver resolver, boolean sort)
+	public static ProjectIterator buildRelationIterator(Project project, boolean sort)
 		throws IOException{
-		Iterator<Row> iterator = buildRelationIterator(project.getRelation(), resolver, sort);
+		Iterator<Row> iterator = buildRelationIterator(project.getRelation(), sort);
 		if(project.getFilter()!=null){
 			FilterIterator filterIterator = new FilterIterator(iterator, project.getFilter());
 			iterator = filterIterator;
@@ -30,24 +31,22 @@ public class IteratorBuilder {
 		
 	}
 
-	private static Iterator<Row> buildRelationIterator(Relation relation, 
-			SchemaResolver resolver, boolean sort) throws IOException {
+	private static Iterator<Row> buildRelationIterator(Relation relation,  boolean sort) throws IOException {
 		if(relation instanceof Table){
 			String tableName = ((Table) relation).tableName();
-			return new CSVScanIteraor(resolver, resolver.getTablePath(tableName), tableName);
+			return new CSVScanIteraor(SimpleSQL.getSchemaResolver().getTablePath(tableName), tableName);
 		}else if(relation instanceof Join){
 			Join join = (Join) relation;
-			Iterator<Row> left = buildRelationIterator(join.getLeft(), resolver, sort);
-			Iterator<Row> right = buildRelationIterator(join.getRight(), resolver, sort);
+			Iterator<Row> left = buildRelationIterator(join.getLeft(), sort);
+			Iterator<Row> right = buildRelationIterator(join.getRight(), sort);
 			
 			return JoinIteratorBuilder.
 					newInstance().
 					useSort(sort).
 					setJoin(join).
-					setDataSourceIterator(left, right).
-					setResolver(resolver).build();
+					setDataSourceIterator(left, right).build();
 		}else if(relation instanceof Project){
-			return buildRelationIterator((Project)relation, resolver, sort);
+			return buildRelationIterator((Project)relation, sort);
 		}else{
 			throw new IllegalStateException("unsupported type of data source");
 		}

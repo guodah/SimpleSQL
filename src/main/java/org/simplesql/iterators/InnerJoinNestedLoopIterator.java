@@ -12,8 +12,8 @@ public class InnerJoinNestedLoopIterator extends JoinIterator{
 	private List<Row> leftRows;
 	private List<Row> rightRows;
 	private java.util.Iterator<Row> joinResultIterator;
-	public InnerJoinNestedLoopIterator(InnerJoin operator, Iterator<Row> left, Iterator<Row> right, SchemaResolver resolver) {
-		super(operator, left, right, resolver);
+	public InnerJoinNestedLoopIterator(InnerJoin operator, Iterator<Row> left, Iterator<Row> right) {
+		super(operator, left, right);
 		
 		// loading the entirety of left and right
 		leftRows = new ArrayList<>();

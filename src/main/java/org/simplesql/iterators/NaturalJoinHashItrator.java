@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.simplesql.relational_algebra.Column;
+import org.simplesql.relational_algebra.Expression;
 import org.simplesql.relational_algebra.LiteralValue;
 import org.simplesql.relational_algebra.NaturalJoin;
 import org.simplesql.resolve.SchemaResolver;
@@ -16,11 +17,11 @@ import org.simplesql.resolve.SchemaResolver;
 public class NaturalJoinHashItrator extends JoinIterator {
 	private java.util.Iterator<Row> joinResultIterator;
 	private Map<Object, Object> map;
-	private List<Column> commonColumns;
-	public NaturalJoinHashItrator(NaturalJoin operator, Iterator<Row> left, Iterator<Row> right, SchemaResolver resolver) {
-		super(operator, left, right, resolver);
+	private List<Expression<?>> commonColumns;
+	public NaturalJoinHashItrator(NaturalJoin operator, Iterator<Row> left, Iterator<Row> right) {
+		super(operator, left, right);
 		map = new HashMap<>();
-		commonColumns = operator.findCommonColumns(resolver);
+		commonColumns = operator.findCommonColumns();
 		List<Row> joinResult = new ArrayList<Row>();
 		if(commonColumns.size()!=0){
 			buildBuckets();
@@ -43,9 +44,9 @@ public class NaturalJoinHashItrator extends JoinIterator {
 		List<Row> rows = null;
 		List<Row> result = new ArrayList<>();
 		for(int i=0;i<commonColumns.size();i++){
-			String column = commonColumns.get(i).getColumn();
-			@SuppressWarnings("rawtypes")
-			LiteralValue value = row.getValueWithoutTable(column);
+			String column = commonColumns.get(i).getSimpleName();
+			
+			Object value = row.getValueWithoutTable(column);
 			
 			if(!tmap.containsKey(value)){
 				return result;
@@ -83,8 +84,8 @@ public class NaturalJoinHashItrator extends JoinIterator {
 			throw new IllegalStateException("row header does not contain table name");
 		}
 		field = field.substring(dotPosition+1);
-		for(Column each:commonColumns){
-			if(each.getColumn().equals(field)){
+		for(Expression<?> each:commonColumns){
+			if(each.getSimpleName().equals(field)){
 				return true;
 			}
 		}
@@ -103,9 +104,8 @@ public class NaturalJoinHashItrator extends JoinIterator {
 		Map<Object, Object> tmap = map;
 		
 		for(int i=0;i<commonColumns.size();i++){
-			String column = commonColumns.get(i).getColumn();
-			@SuppressWarnings("rawtypes")
-			LiteralValue value = row.getValueWithoutTable(column);
+			String column = commonColumns.get(i).getSimpleName();
+			Object value = row.getValueWithoutTable(column);
 		
 			if(!tmap.containsKey(value)){
 				if(i==commonColumns.size()-1){

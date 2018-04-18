@@ -8,27 +8,37 @@ import java.util.Set;
 import org.simplesql.relational_algebra.DoubleValue;
 import org.simplesql.relational_algebra.LiteralValue;
 import org.simplesql.relational_algebra.LongValue;
+import org.simplesql.relational_algebra.StringValue;
 import org.simplesql.resolve.SchemaResolver;
 
 public class Row {
 	private Map<String, LiteralValue> fields;
 	private String tableName;
-	private SchemaResolver resolver;
-	
-	public Row(String tableName, SchemaResolver resolver){
+		
+	public Row(String tableName){
 		this();
 		this.tableName = tableName.toUpperCase();
-		this.resolver = resolver;
 	}
 	
 	public Row(){
 		fields = new HashMap<>();
 	}
 	
-	public void put(String fieldName, LiteralValue value){
+	public void put(String fieldName, Object value){
 		fieldName = fieldName.toUpperCase();
-		fields.put(fieldName, value);
+		if(value instanceof LiteralValue){
+			fields.put(fieldName, (LiteralValue)value);
+		}else if(value instanceof Double){
+			fields.put(fieldName, new DoubleValue((Double)value));
+		}else if(value instanceof Long){
+			fields.put(fieldName, new LongValue((Long)value));	
+		}else if(value instanceof String){
+			fields.put(fieldName, new StringValue((String)value));
+		}else{
+			throw new IllegalStateException("unrecognized datat type: "+value.getClass());
+		}			
 	}
+		
 	
 	public long getFieldAsLong(String fieldName){
 		return ((LongValue)fields.get(fieldName)).evaluate(null);
@@ -38,7 +48,7 @@ public class Row {
 		return ((DoubleValue)fields.get(fieldName)).evaluate(null);
 	}
 	
-	protected LiteralValue<?> getValueWithoutTable(String column){
+	protected LiteralValue getValueWithoutTable(String column){
 		for(String each:fields.keySet()){
 			if(!each.contains(".")) continue;
 			

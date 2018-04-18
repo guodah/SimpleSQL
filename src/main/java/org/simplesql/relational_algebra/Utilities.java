@@ -5,26 +5,37 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.simplesql.SimpleSQL;
 import org.simplesql.iterators.ProjectIterator;
 import org.simplesql.iterators.Row;
 import org.simplesql.parse.SimpleSQLLexer;
 import org.simplesql.parse.SimpleSQLParser;
 import org.simplesql.parse.SimpleSQLParser.ColumnContext;
 import org.simplesql.parse.SimpleSQLParser.ExprContext;
+import org.simplesql.parse.SimpleSQLParser.FunctionContext;
 import org.simplesql.parse.SimpleSQLParser.Literal_valueContext;
 import org.simplesql.parse.SimpleSQLParser.ParseContext;
 import org.simplesql.parse.SimpleSQLParser.RelationContext;
 import org.simplesql.resolve.SchemaResolver;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
+
 public class Utilities {
-	public static Project parseTreeToRelAlg(SimpleSQLParser parser, URL schema) throws MalformedURLException, IOException{
+	@SuppressWarnings("unchecked")
+	private static Set<String> AGGREGATE_FUNCTIONS = new HashSet<String>(Arrays.asList(
+				new String[]{"COUNT", "SUM", "AVERAGE", "MAX", "MIN"}));
+	
+	
+	public static Project parseTreeToRelAlg(SimpleSQLParser parser) throws MalformedURLException, IOException{
 		ParseContext tree = parser.parse();
-		SchemaResolver resolver = new SchemaResolver(schema);
-		return findProject(tree, resolver);
+		return findProject(tree, SimpleSQL.getSchemaResolver());
 	}
 
 	private static Project findProject(ParseContext tree,SchemaResolver resolver){
@@ -32,7 +43,6 @@ public class Utilities {
 		findDataSource(project, tree, resolver);
 		findFilter(project, tree);
 		findColumns(project, tree);
-		findAggregates(project, tree);
 		findGroupBy(project, tree);
 				
 		if(!project.resolve(resolver, System.out)){
@@ -43,111 +53,144 @@ public class Utilities {
 		
 	}
 
+	private static boolean isAggregateFunction(String function){
+		return AGGREGATE_FUNCTIONS.contains(function);
+	}
+	
+	private static Function<?> findFunction(FunctionContext functionContext){
+		String function = functionContext.function_name().getText();
+		if(isAggregateFunction(function)){
+			Expression<?> column = findExpr(functionContext.expr().get(0));
+			return AggregateBuilder.
+					newInstance().
+					setColumn(column).
+					setFunction(function).
+					build();
+		}else{
+			throw new IllegalStateException("function unsupported: "+function);
+		}
+	}
+	
+	private static Expression<?> findExpr(ExprContext expr){
+		if(expr.function()!=null){
+			return findFunction(expr.function());
+		}else if(expr.column()!=null){
+			return findColumn(expr.column());
+		}else if(expr.literal_value()!=null){
+			return findLiteralValue(expr.literal_value());
+		}else if(expr.add_sub()!=null || expr.mul_div()!=null 
+				|| expr.compare_operator()!=null || expr.AND()!=null || expr.OR()!=null){
+			return findBinaryExpression(expr);
+		}else if(expr.getText().equals("*")){
+			return new Column("*");
+		}else{
+			throw new IllegalStateException("unregconized expression: "+expr.getText());
+		}
+	}
+	
+	private static Expression<?> findLiteralValue(Literal_valueContext literal) {
+		if(literal.NULL()!=null){
+			return new NullValue();
+		}else if(literal.STRING_LITERAL()!=null){
+			return new StringValue(literal.STRING_LITERAL().getText());
+		}else{ //literal.NUMERIC_LITERAL()!=null
+			String str = literal.getText();
+			if(str.contains(".") || str.contains("E")){
+				return new DoubleValue(Double.parseDouble(str));
+			}else{
+				return new LongValue(Long.parseLong(str));
+			}
+		}
+	}
+
 	private static void findGroupBy(Project project, ParseContext tree) {
 		if(tree.group_by()==null) return;
 		
-		List<ColumnContext> columns = tree.group_by().columns().column();
+		List<ExprContext> columns = tree.group_by().columns().expr();
 		GroupBy groupBy = new GroupBy();
-		for(ColumnContext each:columns){
-			groupBy.addColumn(findColumn(each));
+		for(ExprContext each:columns){
+			groupBy.addColumn(findColumn(each.column()));
 		}
 		groupBy.setAggregates(project.getAggregates());
 		project.addGroupBy(groupBy);
 	}
 
-	private static void findAggregates(Project project, ParseContext tree) {
-		List<ColumnContext> columns = tree.columns().column();
-		for(ColumnContext each:columns){
-			if(each.function()!=null){
-				Column column = null;
-				if(each.function().expr().get(0).column()!=null){
-					column = findColumn(each.function().expr().get(0).column());
-				}else if(each.function().expr().get(0).WILDCARD()!=null){
-					column = new Column("*");
-				}
-				
-				project.addAggregate(findAggregateFunction(column, each.function().function_name().getText()));
-			}
-		}		
-	}
-
-	private static Aggregate findAggregateFunction(Column column, String text) {
-		text = text.toUpperCase();
-		if(text.equals("SUM")){
-			return new AggregateSum(column);
-		}else if(text.equals("COUNT")){
-			return new AggregateCount(column);
-		}else{
-			throw new IllegalStateException("unsupported aggregate function");
-		}
-	}
 
 	private static void findFilter(Project project, ParseContext tree){
 		if(tree.WHERE()==null) return;
-		Expression<?> expr = findExpression(tree.expr());
+		Expression<?> expr = findExpr(tree.expr());
 		if(expr instanceof BooleanBinaryExpression){
 			Filter filter = new Filter((BooleanBinaryExpression)expr);
 			project.setFilter(filter);
 		}
 	}
 	
-	private static Expression<?> findExpression(ExprContext context){
-		if(context==null){
-			return null;
-		}else if(context.column()!=null){
-			return findColumn(context.column());
-		}else if(context.literal_value()!=null){
-			Literal_valueContext literal = context.literal_value();
-			if(literal.NULL()!=null){
-				return new NullValue();
-			}else if(literal.STRING_LITERAL()!=null){
-				return new StringValue(literal.STRING_LITERAL().getText());
-			}else{ //literal.NUMERIC_LITERAL()!=null
-				String str = literal.getText();
-				
-				if(str.contains(".") || str.contains("E")){
-					return new DoubleValue(Double.parseDouble(str));
-				}else{
-					return new LongValue(Long.parseLong(str));
-				}
-			}
-		}
+	private static Expression<?> findBinaryExpression(ExprContext context){
 		
-		Expression<?> left = findExpression( context.expr(0));
-		Expression<?> right = findExpression( context.expr(1));
-		String operator = findOperator(context);
-		return new BooleanBinaryExpression(left, operator, right);
+		Expression<?> left = findExpr( context.expr(0));
+		Expression<?> right = findExpr( context.expr(1));
+		
+		if(context.add_sub()!=null || context.mul_div()!=null){
+			return new NumericBinaryExpression(left, findOperator(context), right);
+		}else{
+			return new BooleanBinaryExpression(left, findOperator(context), right);
+		}
 	}
 	
 	private static String findOperator(ExprContext context) {
-		if(context.GT()!=null){
-			return ">";
-		}else if(context.LT()!=null){
-			return "<";
-		}else if(context.GTEQ()!=null){
-			return ">=";
-		}else if(context.LTEQ()!=null){
-			return "<=";
-		}else if(context.EQ()!=null){
-			return "=";
-		}else if(context.NEQ()!=null){
-			return "<>";
-		}else if(context.IS()!=null){
-			return "is";
+		if(context.add_sub()!=null){
+			if(context.add_sub().ADD()!=null){
+				return "+";
+			}else if(context.add_sub().SUB()!=null){
+				return "-";
+			}else{
+				throw new IllegalStateException("unrecognized numeric operator: "+context.getText());
+			}
+		}else if(context.mul_div()!=null){
+			if(context.mul_div().MUL()!=null){
+				return "*";
+			}else if(context.mul_div().DIV()!=null){
+				return "/";
+			}else{
+				throw new IllegalStateException("unrecognized numeric operator: "+context.getText());
+			}
+		}else if(context.compare_operator()!=null){
+			if(context.compare_operator().GT()!=null){
+				return ">";
+			}else if(context.compare_operator().LT()!=null){
+				return "<";
+			}else if(context.compare_operator().GTEQ()!=null){
+				return ">=";
+			}else if(context.compare_operator().LTEQ()!=null){
+				return "<=";
+			}else if(context.compare_operator().EQ()!=null){
+				return "=";
+			}else if(context.compare_operator().NEQ()!=null){
+				return "<>";
+			}else if(context.compare_operator().IS()!=null){
+				return "is";
+			}else{
+				throw new IllegalStateException("unrecognized compare operator: "+context.getText());
+			}
 		}else if(context.AND()!=null){
 			return "AND";
 		}else if(context.OR()!=null){
 			return "OR";
+		}else{
+			throw new IllegalStateException("unrecognized operator: "+context.getText());
 		}
-		
-		throw new IllegalStateException("Unrecognized operator");
 	}
 
 	private static void findColumns(Project project, ParseContext tree){
-		List<ColumnContext> columns = tree.columns().column();
-		for(ColumnContext each:columns){
-			Column column = findColumn(each);
-			if(column!=null){
+		List<ExprContext> columns = tree.columns().expr();
+		
+		for(ExprContext each:columns){
+			Expression<?> column = findExpr(each);
+			if(column==null){
+				continue;
+			}else if(column instanceof Aggregate){
+				project.addAggregate((Aggregate)column);				
+			}else {
 				project.addColumn(column);
 			}
 		}		
@@ -161,8 +204,6 @@ public class Utilities {
 			String table = each.table_column().ANY_NAME().get(0).getText();
 			String column = each.table_column().ANY_NAME().get(1).getText();
 			return new Column(table, column);		
-		}else if(each.function()!=null){
-			return null;
 		}else{
 			throw new IllegalStateException("unsupport column");
 		}
@@ -183,7 +224,7 @@ public class Utilities {
 			
 			Expression<?> joinCondition = null;
 			if(relationContext.join_condition()!=null){
-				joinCondition = findExpression(relationContext.join_condition().expr());
+				joinCondition = findExpr(relationContext.join_condition().expr());
 			}
 
 			String joinType = relationContext.join_operator().join_type().getText(); 
@@ -198,60 +239,6 @@ public class Utilities {
 			return findProject(relationContext.parse(), resolver);
 		}else{
 			throw new IllegalStateException("unsupported data source: "+relationContext.getText());
-		}
-	}
-
-
-	public static void main(String args[]) throws IOException{
-		test("schema/test.json", "sELECT testtableA.a, testtableB.b FROM testtableA "+
-					"inner join testtableB on testtableA.a=testtableB.a and testtableA.b=testtableB.b;");
-
-		test("schema/test.json", "sELECT a, b, sum(c), count(*) FROM testtableA  natural join testtableB "+
-					"where a>1 and b<5 GROUP BY a,b;");
-
-		test("schema/test.json", "sELECT a, b,c,d,e,  g FROM testtableA natural join testtableB "+
-					"natural join testtableC;");
-	}
-
-	private static void test(String schemaPath, String sql)throws IOException{
-//		CharStream input = CharStreams.fromFileName(sqlFile);
-		CharStream input = CharStreams.fromStream(new ByteArrayInputStream(sql.toUpperCase().getBytes()));
-		SimpleSQLLexer lexer = new SimpleSQLLexer(input);
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		SimpleSQLParser parser = new SimpleSQLParser(tokens);
-
-		Project ra = parseTreeToRelAlg(parser, new File(schemaPath).toURI().toURL());
-		System.out.println(ra);
-		
-//		SchemaResolver resolver = new SchemaResolver(new File(schemaPath).toURI().toURL());
-//		ProjectIterator projectIterator = IteratorBuilder.buildCSVProjectIterator(ra, resolver);
-//		print(projectIterator);		
-	}
-	
-	private static void print(ProjectIterator projectIterator) {
-		List<Column> columns = projectIterator.getColumns();
-		StringBuilder sb = new StringBuilder();
-		for(Column each:columns){
-			sb.append(each.toString()+"\t");
-		}
-		if(projectIterator.getAggregates()!=null){
-			for(Aggregate aggregate:projectIterator.getAggregates()){
-				sb.append(aggregate.toString()+"\t");
-			}
-		}
-		System.out.println(sb.toString());
-		while(projectIterator.hasNext()){
-			sb = new StringBuilder();
-			Row row = projectIterator.next();
-			for(Column each:columns){
-				sb.append(row.get(each.toString())+"\t");
-			}		
-			if(projectIterator.getAggregates()!=null){
-				for(Aggregate aggregate:projectIterator.getAggregates()){
-					sb.append(row.get(aggregate.toString())+"\t");
-				}
-			}
-			System.out.println(sb.toString());
 		}
 	}
 }

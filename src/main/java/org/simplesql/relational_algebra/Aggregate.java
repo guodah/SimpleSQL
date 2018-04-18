@@ -4,23 +4,23 @@ import java.io.OutputStream;
 
 import org.simplesql.resolve.SchemaResolver;
 
-public abstract class Aggregate{
-	protected Column column;
+public abstract class Aggregate<T extends LiteralValue> extends Function<T>{
+	protected Expression<?> column;
 
-	public Aggregate(Column column){
+	public Aggregate(Expression<?> column){
 		this.column = column;
 	}
 	
-	public Column getColumn(){
+	public Expression<?> getColumn(){
 		return column;
 	}
 	
-	abstract public Aggregate duplicate();
-	abstract public void add(LiteralValue val);
-	abstract public LiteralValue aggregatedValue();
+	abstract public Aggregate<?> duplicate();
+	abstract public void add(LiteralValue<?> val);
+	abstract public T aggregatedValue();
 
-	public boolean resolve(Relation dataSource, SchemaResolver resolver, OutputStream output){
-		return column.resolve(dataSource, resolver, output); 
+	public boolean resolve(Relation relation, OutputStream output){
+		return column.resolve(relation, output); 
 	}
 	
 }

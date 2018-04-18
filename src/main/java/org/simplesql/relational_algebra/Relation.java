@@ -8,7 +8,7 @@ import org.simplesql.resolve.SchemaResolver;
 
 public abstract class Relation {
 	abstract public boolean resolve(SchemaResolver resolver, OutputStream output);
-	abstract public List<Column> getColumns(SchemaResolver resolver);
+	
 	
 	public Table findTable(String table){
 		return findTable(this, table);
@@ -30,5 +30,8 @@ public abstract class Relation {
 		return null;
 	}
 	
-	abstract public Table locateColumn(String column, SchemaResolver resolver) ;
+	abstract public Table locateColumn(String column) ;
+
+
+	abstract public List<Expression<?>> getColumns();
 }

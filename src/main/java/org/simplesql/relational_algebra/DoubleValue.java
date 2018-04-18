@@ -5,10 +5,9 @@ import java.io.OutputStream;
 import org.simplesql.iterators.Row;
 import org.simplesql.resolve.SchemaResolver;
 
-public class DoubleValue extends LiteralValue<Double>{
+public class DoubleValue extends NumericValue<Double>{
 	private double val;
 	public DoubleValue(double val){
-		super(false);
 		this.val = val;
 	}
 	
@@ -22,7 +21,7 @@ public class DoubleValue extends LiteralValue<Double>{
 	}
 
 	@Override
-	public String getType(SchemaResolver resolver) {
+	public String getType() {
 		return "DOUBLE";
 	}
 	

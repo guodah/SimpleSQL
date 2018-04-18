@@ -8,18 +8,11 @@ import org.simplesql.loggin.Logging;
 import org.simplesql.resolve.SchemaResolver;
 import org.simplesql.resolve.Types;
 
-public class BooleanBinaryExpression extends Expression <Boolean>{
-	private String operator;
-	private Expression<?> left, right;
+public class BooleanBinaryExpression extends BinaryExpression <Boolean>{
 	public BooleanBinaryExpression(Expression<?> left, String operator, Expression<?> right){
-		this.left = left;
-		this.right = right;
-		this.operator = operator;
+		super(left, operator, right);
 	}
 	
-	public String toString(){
-		return String.format("%s %s %s", left, operator, right);
-	}
 
 	@Override
 	public Boolean evaluate(Row ctx) {
@@ -51,31 +44,62 @@ public class BooleanBinaryExpression extends Expression <Boolean>{
 	private boolean isLogicalOperator(String operator) {
 		return operator.equals("AND") || operator.equals("OR");
 	}
+	
+	private boolean isCompareOperator(String operator){
+		return operator.equals("AND") || operator.equals("OR") ||
+				operator.equals(">=") || operator.equals("<=") ||
+				operator.equals(">") || operator.equals("<") ||
+				operator.equals("<>") || operator.equals("=") ||
+				operator.equals("IS");
+	}
 
 	@Override
-	public boolean resolve(Relation dataSource, SchemaResolver resolver, OutputStream output) {
-		boolean leftResult = left.resolve(dataSource, resolver, output);
-		boolean rightResult = right.resolve(dataSource, resolver, output);
-	
-		if(!leftResult || !rightResult){
+	public boolean resolve(Relation dataSource, OutputStream output) {
+		if(!super.resolve(dataSource,  output)){
 			return false;
 		}
 		
-		if(!Types.isCompatible(
-				left.getType(resolver), right.getType(resolver))){
-			Logging.error(String.format("%s and %s are typed differently", left, right));
+		if(!checkOperator(operator)){
 			return false;
 		}
 		
-		if((operator.equals("OR") || operator.equals("AND")) && (!left.getType(resolver).equals("BOOLEAN") ||
-					!right.getType(resolver).equals("BOOLEAN"))){
-			Logging.error(String.format("%s and %s are not BOOLEAN type", left, right));	
+		if(isLogicalOperator(operator) && (!isBoolean(left) || !isBoolean(right))){
+			return false;
 		}
 		
 		return true;
 	}
 	
+	private boolean isBoolean(Expression<?> left) {
+		return left.isBoolean();
+	}
+
+
+	private boolean checkOperator(String operator) {
+		return this.isCompareOperator(operator) ||
+				this.isLogicalOperator(operator);
+	}
+
+
 	public String getType(SchemaResolver resolver){
+		return "BOOLEAN";
+	}
+
+
+	@Override
+	public boolean isNumeric() {
+		return false;
+	}
+
+
+	@Override
+	public boolean isBoolean() {
+		return true;
+	}
+
+
+	@Override
+	public String getType() {
 		return "BOOLEAN";
 	}
 

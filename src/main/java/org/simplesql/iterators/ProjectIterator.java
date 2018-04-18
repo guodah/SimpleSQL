@@ -6,6 +6,8 @@ import java.util.Set;
 
 import org.simplesql.relational_algebra.Aggregate;
 import org.simplesql.relational_algebra.Column;
+import org.simplesql.relational_algebra.Expression;
+import org.simplesql.relational_algebra.LiteralValue;
 import org.simplesql.relational_algebra.Project;
 
 public class ProjectIterator implements Iterator<Row>{
@@ -28,11 +30,8 @@ public class ProjectIterator implements Iterator<Row>{
 		Row row = downStream.next();
 		Row res = new Row();
 		
-		for(Column each:project.getColumns()){
-			String columnName = each.evaluate(null);
-			if(row.containsField(columnName)){
-				res.put(each.evaluate(null), row.get(columnName));
-			}
+		for(Expression<?> each:project.getColumns()){
+			res.put(each.getFullName(), each.evaluate(row));
 		}
 		
 		for(Aggregate each:project.getAggregates()){
@@ -50,7 +49,7 @@ public class ProjectIterator implements Iterator<Row>{
 		downStream.reset();
 	}
 
-	public List<Column> getColumns(){
+	public List<Expression<?>> getColumns(){
 		return project.getColumns();
 	}
 	

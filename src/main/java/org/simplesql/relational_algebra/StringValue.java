@@ -21,7 +21,7 @@ public class StringValue extends LiteralValue<String> {
 		return toString();
 	}
 	@Override
-	public String getType(SchemaResolver resolver) {
+	public String getType() {
 		return "STRING";
 	}
 	@Override
@@ -35,4 +35,26 @@ public class StringValue extends LiteralValue<String> {
 		else
 			return false;
 	}
+
+	
+	
+	@Override
+	public boolean isNumeric() {
+		return false;
+	}
+
+	@Override
+	public boolean isBoolean() {
+		return false;
+	}
+
+	@Override
+	public String getSimpleName() {
+		return toString();
+	}
+
+	@Override
+	public String getFullName() {
+		return toString();
+	}	
 }

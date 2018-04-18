@@ -10,7 +10,7 @@ abstract public class JoinIterator implements Iterator<Row>{
 	protected Join operator;
 	protected SchemaResolver resolver;
 
-	public JoinIterator(Join operator, Iterator<Row> left, Iterator<Row> right, SchemaResolver resolver){
+	public JoinIterator(Join operator, Iterator<Row> left, Iterator<Row> right){
 		this.left = left;
 		this.right = right;
 		this.operator = operator;

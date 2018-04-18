@@ -22,7 +22,6 @@ public class GroupByIterator implements Iterator<Row> {
 	private Map<Object, Object> map;
 	private java.util.Iterator<Row> rowIterator;
 	
-		
 	public GroupByIterator(GroupBy groupBy, Iterator<Row> downStream){
 		this.groupBy = groupBy;
 		this.downStream = downStream;
@@ -104,7 +103,7 @@ public class GroupByIterator implements Iterator<Row> {
 		for(int i=0;i<buckets.size();i++){
 			String field = buckets.get(i).getColumn().toString();
 			if(field.equals("*"))
-				buckets.get(i).add(NullValue.NULL);
+				buckets.get(i).add(LongValue.ZERO);
 			else{
 				buckets.get(i).add(row.get(field));
 			}

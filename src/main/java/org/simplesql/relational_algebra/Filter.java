@@ -33,6 +33,6 @@ public class Filter {
 	}
 	
 	public boolean resolve(Relation dataSource, SchemaResolver resolver, OutputStream output){
-		return expression.resolve(dataSource, resolver, output);
+		return expression.resolve(dataSource, output);
 	}
 }

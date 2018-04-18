@@ -21,11 +21,22 @@ public abstract class Expression <T>{
 		return resolved;
 	}
 	
+	abstract public String getSimpleName();
+	abstract public String getFullName();
+	
 	abstract public T evaluate(Row ctx);
 	
-	abstract public boolean resolve(Relation dataSource, SchemaResolver resolver, OutputStream output);
+	abstract public boolean resolve(Relation dataSource, OutputStream output);
 
-	abstract public String getType(SchemaResolver resolver);
+	abstract public String getType();
+	
+	public Table locateColumn(String column){
+		if(this instanceof LiteralValue){
+			return null;
+		}else{
+			throw new IllegalStateException("unsupported operation");
+		}
+	}
 	
 	public static int compare(Expression<?> left, Expression<?> right, Row ctx) {
 		Object leftValue = getLiteral(left, ctx);
@@ -66,20 +77,26 @@ public abstract class Expression <T>{
 		// both left and right should be either a literal or a column
 		if(!isLiteralOrColumn(expr)){
 			throw new IllegalStateException(
-					"unimplemented: comparing objects other than literal or column");
+				"unimplemented: comparing objects other than literal or column");
 		}
 
 		Object value = null;
 		if(expr instanceof Column){
-			value = ctx.get(expr.toString()).evaluate(null);
+			value = ctx.get(expr.getFullName()).evaluate(null);
 		}else{
 			value = ((LiteralValue)expr).evaluate(null);
 		}
 		return value;
 	}
 	
+	
+	
 	private static boolean isLiteralOrColumn(Expression<?> expr) {
 		return (expr instanceof LiteralValue) || (expr instanceof Column);
 	}
+
+	abstract public boolean isNumeric();
+
+	abstract public boolean isBoolean();
 
 }

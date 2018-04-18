@@ -3,11 +3,9 @@ package org.simplesql.iterators;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
-import org.simplesql.relational_algebra.Column;
 import org.simplesql.relational_algebra.Expression;
 import org.simplesql.relational_algebra.LiteralValue;
 import org.simplesql.relational_algebra.NaturalJoin;
-import org.simplesql.resolve.SchemaResolver;
 
 class SortKey implements Comparable<SortKey>{
 	private List<LiteralValue<?>> lst;
@@ -48,18 +46,16 @@ class SortKey implements Comparable<SortKey>{
 	}
 }
 public class NaturalJoinSortIterator extends JoinIterator{
-	private List<Column> commonColumns;
+	private List<Expression<?>> commonColumns;
 	private java.util.Iterator<Row> joinResultIterator;
 	private TreeMap<SortKey, List<Row>> buckets;
 	private Iterator<Row> left, right;
-	private SchemaResolver resolver;
 	public NaturalJoinSortIterator(NaturalJoin operator, Iterator<Row> left, 
-				Iterator<Row> right, SchemaResolver resolver) {
-		super(operator, left, right, resolver);
+				Iterator<Row> right) {
+		super(operator, left, right);
 		this.left = left;
 		this.right = right;
-		this.resolver = resolver;
-		commonColumns = operator.findCommonColumns(resolver);
+		commonColumns = operator.findCommonColumns();
 		buckets = new TreeMap<>();
 		List <Row> joinResult = new ArrayList<>();
 		if(commonColumns.size()!=0){
@@ -112,8 +108,8 @@ public class NaturalJoinSortIterator extends JoinIterator{
 			throw new IllegalStateException("row header does not contain table name");
 		}
 		field = field.substring(dotPosition+1);
-		for(Column each:commonColumns){
-			if(each.getColumn().equals(field)){
+		for(Expression<?> each:commonColumns){
+			if(each.getSimpleName().equals(field)){
 				return true;
 			}
 		}
@@ -127,15 +123,14 @@ public class NaturalJoinSortIterator extends JoinIterator{
 			if(!buckets.containsKey(key)){
 				buckets.put(key, new ArrayList<>());
 			}
-//			System.out.println(buckets.containsKey(key));
 			buckets.get(key).add(row);
 		}
 	}
 	
 	private SortKey getKey(Row row) {
 		List<LiteralValue<?>> values = new ArrayList<>();
-		for(Column each:commonColumns){
-			values.add(row.getValueWithoutTable(each.getColumn()));
+		for(Expression<?> each:commonColumns){
+			values.add(row.getValueWithoutTable(each.getSimpleName()));
 		}
 		return new SortKey(values);
 	}

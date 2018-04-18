@@ -2,18 +2,18 @@ package org.simplesql.relational_algebra;
 
 import java.io.OutputStream;
 
-import org.simplesql.resolve.SchemaResolver;
+import org.simplesql.iterators.Row;
 
-public class AggregateCount extends Aggregate {
+public class AggregateCount extends Aggregate<LongValue> {
 	private int count;
-	public AggregateCount(Column column) {
+	public AggregateCount(Expression<?> column) {
 		super(column);
 		count = 0;
 	}
 
 	@Override
-	public void add(LiteralValue val) {
-		if(val instanceof NullValue && !column.toString().equals("*")){
+	public void add(LiteralValue<?> val) {
+		if(val instanceof NullValue){
 			return;
 		}else{
 			count++;
@@ -21,7 +21,7 @@ public class AggregateCount extends Aggregate {
 	}
 
 	@Override
-	public LiteralValue aggregatedValue() {
+	public LongValue aggregatedValue() {
 		return new LongValue(count);
 	}	
 
@@ -36,7 +36,33 @@ public class AggregateCount extends Aggregate {
 	}
 
 	@Override
-	public boolean resolve(Relation dataSource, SchemaResolver resolver, OutputStream output) {
+	public String getSimpleName() {
+		return toString();
+	}
+
+	@Override
+	public String getFullName() {
+		return toString();
+	}
+
+	@Override
+	public LongValue evaluate(Row ctx) {
+		return aggregatedValue();
+	}
+
+	@Override
+	public String getType() {
+		return "LONG";
+	}
+
+	@Override
+	public boolean isNumeric() {
 		return true;
 	}
+
+	@Override
+	public boolean isBoolean() {
+		return false;
+	}
+
 }

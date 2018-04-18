@@ -5,6 +5,7 @@ import static org.simplesql.relational_algebra.Utilities.parseTreeToRelAlg;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -12,7 +13,9 @@ import java.util.TreeMap;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.junit.Before;
 import org.junit.Test;
+import org.simplesql.SimpleSQL;
 import org.simplesql.iterators.Iterator;
 import org.simplesql.iterators.IteratorBuilder;
 import org.simplesql.iterators.ProjectIterator;
@@ -25,6 +28,12 @@ import org.simplesql.resolve.SchemaResolver;
 
 public class TestMain {
 	private final static String SCHEMA = "schema/test.json"; 
+	
+	@Before
+	public void setUp() throws MalformedURLException, IOException{
+		SimpleSQL.setSchema(new File(SCHEMA).toURI().toURL());
+	}
+	
 	
 	@Test
 	public void testInnerJoin() throws IOException{
@@ -91,16 +100,30 @@ public class TestMain {
 		assertTrue(result.contains("{TESTTABLEA.A=2, TESTTABLEA.B=4, TESTTABLEA.C=5, TESTTABLEA.D=10}"));
 	}
 	
+	@Test
+	public void testExpressionsAsColumns() throws IOException{
+		List<String> result = execute("select a+1, b*2+c, c+d from testtablea");
+		
+		assertNotNull(result);
+		assertEquals(result.size(), 7);
+		assertTrue(result.contains("{TESTTABLEA.A + 1=2, TESTTABLEA.B * 2 + TESTTABLEA.C=4, TESTTABLEA.C + TESTTABLEA.D=6}"));
+		assertTrue(result.contains("{TESTTABLEA.A + 1=2, TESTTABLEA.B * 2 + TESTTABLEA.C=6, TESTTABLEA.C + TESTTABLEA.D=6}"));
+		assertTrue(result.contains("{TESTTABLEA.A + 1=2, TESTTABLEA.B * 2 + TESTTABLEA.C=7, TESTTABLEA.C + TESTTABLEA.D=9}"));
+		assertTrue(result.contains("{TESTTABLEA.A + 1=2, TESTTABLEA.B * 2 + TESTTABLEA.C=10, TESTTABLEA.C + TESTTABLEA.D=9}"));
+		assertTrue(result.contains("{TESTTABLEA.A + 1=3, TESTTABLEA.B * 2 + TESTTABLEA.C=10, TESTTABLEA.C + TESTTABLEA.D=12}"));
+		assertTrue(result.contains("{TESTTABLEA.A + 1=3, TESTTABLEA.B * 2 + TESTTABLEA.C=14, TESTTABLEA.C + TESTTABLEA.D=12}"));
+		assertTrue(result.contains("{TESTTABLEA.A + 1=3, TESTTABLEA.B * 2 + TESTTABLEA.C=13, TESTTABLEA.C + TESTTABLEA.D=15}"));
+	}
+	
 	private List<String> execute(String sql) throws IOException {
 		CharStream input = CharStreams.fromStream(new ByteArrayInputStream(sql.toUpperCase().getBytes()));
 		SimpleSQLLexer lexer = new SimpleSQLLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		SimpleSQLParser parser = new SimpleSQLParser(tokens);
 
-		Project project = parseTreeToRelAlg(parser, new File(SCHEMA).toURI().toURL());
+		Project project = parseTreeToRelAlg(parser);
 
-		SchemaResolver resolver = new SchemaResolver(new File(SCHEMA).toURI().toURL());
-		ProjectIterator projectIterator = IteratorBuilder.buildRelationIterator(project, resolver, false);
+		ProjectIterator projectIterator = IteratorBuilder.buildRelationIterator(project, false);
 		return buildSet(projectIterator);
 	}
 

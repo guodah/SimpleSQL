@@ -30,16 +30,6 @@ public interface SimpleSQLListener extends ParseTreeListener {
 	 */
 	void exitColumns(SimpleSQLParser.ColumnsContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link SimpleSQLParser#column}.
-	 * @param ctx the parse tree
-	 */
-	void enterColumn(SimpleSQLParser.ColumnContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link SimpleSQLParser#column}.
-	 * @param ctx the parse tree
-	 */
-	void exitColumn(SimpleSQLParser.ColumnContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link SimpleSQLParser#relation}.
 	 * @param ctx the parse tree
 	 */
@@ -109,6 +99,46 @@ public interface SimpleSQLListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitExpr(SimpleSQLParser.ExprContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link SimpleSQLParser#add_sub}.
+	 * @param ctx the parse tree
+	 */
+	void enterAdd_sub(SimpleSQLParser.Add_subContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link SimpleSQLParser#add_sub}.
+	 * @param ctx the parse tree
+	 */
+	void exitAdd_sub(SimpleSQLParser.Add_subContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link SimpleSQLParser#mul_div}.
+	 * @param ctx the parse tree
+	 */
+	void enterMul_div(SimpleSQLParser.Mul_divContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link SimpleSQLParser#mul_div}.
+	 * @param ctx the parse tree
+	 */
+	void exitMul_div(SimpleSQLParser.Mul_divContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link SimpleSQLParser#compare_operator}.
+	 * @param ctx the parse tree
+	 */
+	void enterCompare_operator(SimpleSQLParser.Compare_operatorContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link SimpleSQLParser#compare_operator}.
+	 * @param ctx the parse tree
+	 */
+	void exitCompare_operator(SimpleSQLParser.Compare_operatorContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link SimpleSQLParser#column}.
+	 * @param ctx the parse tree
+	 */
+	void enterColumn(SimpleSQLParser.ColumnContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link SimpleSQLParser#column}.
+	 * @param ctx the parse tree
+	 */
+	void exitColumn(SimpleSQLParser.ColumnContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link SimpleSQLParser#function}.
 	 * @param ctx the parse tree

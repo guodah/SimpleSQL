@@ -10,6 +10,11 @@ class Null implements Comparable<Null>{
 	public int compareTo(Null o) {
 		return 0;
 	}
+	
+	@Override
+	public String toString(){
+		return "NULL";
+	}
 }
 
 public class NullValue extends LiteralValue<Null>{
@@ -25,7 +30,7 @@ public class NullValue extends LiteralValue<Null>{
 		return null;
 	}
 	@Override
-	public String getType(SchemaResolver resolver) {
+	public String getType() {
 		return "NULL";
 	}
 
@@ -33,4 +38,26 @@ public class NullValue extends LiteralValue<Null>{
 	public int hashCode(){
 		return 0;
 	}
+
+	@Override
+	public boolean isNumeric() {
+		return false;
+	}
+
+	@Override
+	public boolean isBoolean() {
+		return false;
+	}
+	
+
+	@Override
+	public String getSimpleName() {
+		return "NULL";
+	}
+
+	@Override
+	public String getFullName() {
+		return "NULL";
+	}
+
 }

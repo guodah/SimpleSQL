@@ -1,25 +1,24 @@
 package org.simplesql.relational_algebra;
 
-public class AggregateSum extends Aggregate{
+import org.simplesql.iterators.Row;
 
-	private LiteralValue sum;
-	private int count;
-	public AggregateSum(Column column) {
+public class AggregateSum extends Aggregate<NumericValue<?>>{
+
+	private LiteralValue<?> sum;
+	public AggregateSum(Expression<?> column) {
 		super(column);
 		sum = null;
 	}
 
 	@Override
-	public void add(LiteralValue val) {
+	public void add(LiteralValue<?> val) {
 		if(sum==null){
 			sum = val;
-			count = 1;
 		}else{
 			if(val instanceof NullValue){
 				return;
 			}else if(val instanceof LongValue){
 				sum = new LongValue(((LongValue)sum).evaluate(null)+((LongValue)val).evaluate(null));
-				count++;
 			}else{
 				throw new IllegalStateException("Unsupported type for aggregate");
 			}
@@ -27,7 +26,7 @@ public class AggregateSum extends Aggregate{
 	}
 
 	@Override
-	public LiteralValue aggregatedValue() {
+	public NumericValue<?> aggregatedValue() {
 		if(sum instanceof LongValue){
 			return new LongValue(((LongValue)sum).evaluate(null));
 		}else{
@@ -42,5 +41,39 @@ public class AggregateSum extends Aggregate{
 
 	public AggregateSum duplicate(){
 		return new AggregateSum(column);
+	}
+
+	@Override
+	public String getSimpleName() {
+		return toString();
+	}
+
+	@Override
+	public String getFullName() {
+		return toString();
+	}
+
+	@Override
+	public NumericValue<?> evaluate(Row ctx) {
+		return this.aggregatedValue();
+	}
+
+	@Override
+	public String getType() {
+		if(sum instanceof LongValue){
+			return "LONG";
+		}else{
+			throw new IllegalStateException("Unsupported type for aggregate");
+		}
+	}
+
+	@Override
+	public boolean isNumeric() {
+		return true;
+	}
+
+	@Override
+	public boolean isBoolean() {
+		return false;
 	}
 }

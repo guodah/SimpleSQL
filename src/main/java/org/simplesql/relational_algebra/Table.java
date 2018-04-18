@@ -1,8 +1,10 @@
 package org.simplesql.relational_algebra;
 
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.simplesql.SimpleSQL;
 import org.simplesql.resolve.SchemaResolver;
 
 public class Table extends Relation{
@@ -22,17 +24,17 @@ public class Table extends Relation{
 		return resolver.validateTable(tableName);
 	}
 	@Override
-	public List<Column> getColumns(SchemaResolver resolver) {
-		if(!resolver.validateTable(tableName)){
+	public List<Expression<?>> getColumns() {
+		if(!SimpleSQL.getSchemaResolver().validateTable(tableName)){
 			throw new IllegalStateException("Table "+tableName+" not found.");
 		}
-		return resolver.findColumns(tableName);
+		return new ArrayList<>(SimpleSQL.getSchemaResolver().findColumns(tableName));
 	}
 	@Override
-	public Table locateColumn(String column, SchemaResolver resolver) {
-		List<Column> columns = getColumns(resolver);
-		for(Column each: columns){
-			if(each.getColumn().equals(column)){
+	public Table locateColumn(String column) {
+		List<? extends Expression<?>> columns = getColumns();
+		for(Expression<?> each: columns){
+			if(((Column)each).getSimpleName().equals(column)){
 				return this; 
 			}
 		}

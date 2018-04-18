@@ -9,7 +9,7 @@ import org.simplesql.resolve.SchemaResolver;
 
 
 public class Project extends Relation{
-	private List<Column> columns;
+	private List<Expression<?>> columns;
 	private Filter filter;
 	private Relation relation;
 	private List<Aggregate> aggregates;
@@ -29,7 +29,7 @@ public class Project extends Relation{
 		aggregates.add(aggregate);
 	}
 	
-	public void addColumn(Column column){
+	public void addColumn(Expression column){
 		columns.add(column);
 	}
 	
@@ -40,11 +40,7 @@ public class Project extends Relation{
 	public void setFilter(Filter filter){
 		this.filter = filter;
 	}
-	
-	public List<Column> getColumns(){
-		return columns;
-	}
-	
+		
 	public String toString(){
 		StringBuilder sb = new StringBuilder();
 		sb.append("(SELECT ");
@@ -111,8 +107,8 @@ public class Project extends Relation{
 		}
 		
 		// resolve the project columns
-		for(Column column:columns){
-			result = result && column.resolve(relation, resolver, output);
+		for(Expression<?> column:columns){
+			result = result && column.resolve(relation,  output);
 		}
 		
 		// resolve the group by clause
@@ -120,19 +116,19 @@ public class Project extends Relation{
 		
 		// resolve the aggregate functions
 		for(Aggregate aggregate:aggregates){
-			result = result && aggregate.resolve(relation, resolver, output);
+			result = result && aggregate.resolve(relation,  output);
 		}
 		return result;
 	}
 
 	@Override
-	public List<Column> getColumns(SchemaResolver resolver) {
-		return this.getColumns();
+	public List<Expression<?>> getColumns() {
+		return this.columns;
 	}
 
 	@Override
-	public Table locateColumn(String column, SchemaResolver resolver) {
-		return this.relation.locateColumn(column, resolver);
+	public Table locateColumn(String column) {
+		return this.relation.locateColumn(column);
 	}
 
 }

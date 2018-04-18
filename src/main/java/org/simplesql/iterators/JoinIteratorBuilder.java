@@ -26,23 +26,18 @@ public class JoinIteratorBuilder {
 		return this;
 	}
 	
-	private SchemaResolver resolver;
-	public JoinIteratorBuilder setResolver(SchemaResolver resolver){
-		this.resolver = resolver;
-		return this;
-	}
 	public static JoinIteratorBuilder newInstance() {
 		return new JoinIteratorBuilder();
 	}
 	public JoinIterator build() {
 		if(join instanceof NaturalJoin){
 			if(sort) {
-				return new NaturalJoinSortIterator((NaturalJoin)join, left, right, resolver);
+				return new NaturalJoinSortIterator((NaturalJoin)join, left, right);
 			}else {
-				return new NaturalJoinHashItrator((NaturalJoin)join, left, right, resolver);
+				return new NaturalJoinHashItrator((NaturalJoin)join, left, right);
 			}
 		}else if(join instanceof InnerJoin){
-			return new InnerJoinNestedLoopIterator((InnerJoin)join, left, right, resolver);
+			return new InnerJoinNestedLoopIterator((InnerJoin)join, left, right);
 		}else {
 			throw new IllegalStateException("unsupported join "+join.getClass());
 		}

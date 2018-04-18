@@ -11,14 +11,14 @@ public class NaturalJoin extends Join{
 		super(left, right);
 	}
 
-	public List<Column> findCommonColumns(SchemaResolver resolver){
-		List<Column> leftColumns = left.getColumns(resolver);
-		List<Column> rightColumns = right.getColumns(resolver);
+	public List<Expression<?>> findCommonColumns(){
+		List<? extends Expression<?>> leftColumns = left.getColumns();
+		List<? extends Expression<?>> rightColumns = right.getColumns();
 		
-		List<Column> res = new ArrayList<Column>();
-		for(Column lc:leftColumns){
-			for(Column rc:rightColumns){
-				if(lc.getColumn().equals(rc.getColumn())){
+		List<Expression<?>> res = new ArrayList<Expression<?>>();
+		for(Expression<?> lc:leftColumns){
+			for(Expression<?> rc:rightColumns){
+				if(lc.getSimpleName().equals(rc.getSimpleName())){
 					res.add(lc);
 					break;
 				}
@@ -28,12 +28,12 @@ public class NaturalJoin extends Join{
 	}
 
 	@Override
-	public List<Column> getColumns(SchemaResolver resolver) {
-		List<Column> leftColumns = left.getColumns(resolver);
-		List<Column> rightColumns = right.getColumns(resolver);
-		List<Column> res = new ArrayList<Column>(leftColumns);
+	public List<Expression<?>> getColumns() {
+		List<? extends Expression<?>> leftColumns = left.getColumns();
+		List<? extends Expression<?>> rightColumns = right.getColumns();
+		List<Expression<?>> res = new ArrayList<>(leftColumns);
 
-		for(Column rc:rightColumns){
+		for(Expression<?> rc:rightColumns){
 			if(!leftColumns.contains(rc)){
 				res.add(rc);
 			}
@@ -47,18 +47,20 @@ public class NaturalJoin extends Join{
 	}
 
 	@Override
-	public Table locateColumn(String column, SchemaResolver resolver) {
-		List<Column> leftColumns = left.getColumns(resolver);
-		for(Column each:leftColumns){
-			if(each.getColumn().equals(column)){
-				return new Table(each.getTableName());
+	public Table locateColumn(String column) {
+		List<? extends Expression<?>> leftColumns = left.getColumns();
+		for(Expression<?> each:leftColumns){
+			Table table = each.locateColumn(column);
+			if(table!=null){
+				return table;
 			}
 		}
 
-		List<Column> rightColumns = right.getColumns(resolver);
-		for(Column each:rightColumns){
-			if(each.getColumn().equals(column)){
-				return new Table(each.getTableName());
+		List<? extends Expression<?>> rightColumns = right.getColumns();
+		for(Expression<?> each:rightColumns){
+			Table table = each.locateColumn(column);
+			if(table!=null){
+				return table;
 			}
 		}
 		return null;
