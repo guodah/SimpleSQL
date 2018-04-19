@@ -128,7 +128,7 @@ public class Project extends Relation{
 
 	@Override
 	public Table locateColumn(String column) {
-		return this.relation.locateColumn(column);
+		return relation.locateColumn(column);
 	}
 
 }

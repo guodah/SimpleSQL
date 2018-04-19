@@ -1,6 +1,6 @@
 ## SimpleSQL
 
-This is a project for me to experience the process of **parsing**, **compiling**, and **executing** SQL statements.   
+This is a project for me to experience the process of **parsing**, **compiling**, and **executing** SQL statements. 
 
 ###Updates:  
 **March 13, 2018**: Using [ANTLR v4](http://www.antlr.org/download.html), defined a simple SQL grammar, supporting basic **"select columns from table where boolean_expression"** SQL statements. It does not support subqueries.
@@ -25,6 +25,8 @@ This is a project for me to experience the process of **parsing**, **compiling**
 
 **April 18, 2018**: Added code for supporting expressions as columns, like "select a+1, b*2+c, c+d from testtablea"
 
-**plan**:
+**April 19, 2018**: Added code for left and right outer join. 
+
+**PLAN**:
 * add count distinct
-* add outer join, semi join
+* add semi join

@@ -20,6 +20,7 @@ import org.simplesql.parse.SimpleSQLParser;
 import org.simplesql.parse.SimpleSQLParser.ColumnContext;
 import org.simplesql.parse.SimpleSQLParser.ExprContext;
 import org.simplesql.parse.SimpleSQLParser.FunctionContext;
+import org.simplesql.parse.SimpleSQLParser.Join_operatorContext;
 import org.simplesql.parse.SimpleSQLParser.Literal_valueContext;
 import org.simplesql.parse.SimpleSQLParser.ParseContext;
 import org.simplesql.parse.SimpleSQLParser.RelationContext;
@@ -40,7 +41,7 @@ public class Utilities {
 
 	private static Project findProject(ParseContext tree,SchemaResolver resolver){
 		Project project = new Project();
-		findDataSource(project, tree, resolver);
+		findRelation(project, tree, resolver);
 		findFilter(project, tree);
 		findColumns(project, tree);
 		findGroupBy(project, tree);
@@ -209,29 +210,30 @@ public class Utilities {
 		}
 	}
 	
-	private static void findDataSource(Project project, ParseContext tree, SchemaResolver resolver){
-		Relation dataSource = findDataSource(tree.relation(), resolver);
+	private static void findRelation(Project project, ParseContext tree, SchemaResolver resolver){
+		Relation dataSource = findRelation(tree.relation(), resolver);
 		project.setRelation(dataSource);
 	}
 	
-	private static Relation findDataSource(RelationContext relationContext, SchemaResolver resolver) {
+	private static Relation findRelation(RelationContext relationContext, SchemaResolver resolver) {
 		if(relationContext.table_name()!=null){
 			return new Table(relationContext.table_name().getText());
 		}else if(relationContext.join_operator()!=null){
 			List<RelationContext> dataSources = relationContext.relation();
-			Relation left = findDataSource( dataSources.get(0), resolver);
-			Relation right = findDataSource( dataSources.get(1), resolver);
+			Relation left = findRelation( dataSources.get(0), resolver);
+			Relation right = findRelation( dataSources.get(1), resolver);
 			
 			Expression<?> joinCondition = null;
 			if(relationContext.join_condition()!=null){
 				joinCondition = findExpr(relationContext.join_condition().expr());
 			}
 
-			String joinType = relationContext.join_operator().join_type().getText(); 
-			if(joinType.equals("NATURAL") || joinType.equals("INNER") && 
-					joinCondition instanceof BooleanBinaryExpression){
-				return Join.defineJoin(left, right, relationContext.join_operator().join_type().getText(), 
-						(BooleanBinaryExpression)joinCondition);
+			String joinType = findJoinType(relationContext.join_operator()); 
+			if(joinType.equals("NATURAL") || (joinType.equals("INNER") || 
+					joinType.equals("LEFT") || joinType.equals("RIGHT"))
+					&& joinCondition instanceof BooleanBinaryExpression){
+					return Join.defineJoin(left, right, joinType, 
+							(BooleanBinaryExpression)joinCondition);					
 			}else{
 				throw new IllegalStateException("unsupported join condition");
 			}
@@ -239,6 +241,26 @@ public class Utilities {
 			return findProject(relationContext.parse(), resolver);
 		}else{
 			throw new IllegalStateException("unsupported data source: "+relationContext.getText());
+		}
+	}
+	
+	private static String findJoinType(Join_operatorContext join_operatorContext){
+		if(join_operatorContext.join_type().NATURAL()!=null){
+			return "NATURAL";
+		}else if(join_operatorContext.join_type().INNER()!=null){
+			return "INNER";
+		}else if(join_operatorContext.join_type().outer()!=null){
+			if(join_operatorContext.join_type().outer().LEFT()!=null){
+				return "LEFT";
+			}else if(join_operatorContext.join_type().outer().RIGHT()!=null){
+				return "RIGHT";
+			}else{
+				throw new IllegalStateException("unsupported join type:"+
+						join_operatorContext.join_type().getText());
+			}
+		}else {
+			throw new IllegalStateException("unsupported join type:"+
+					join_operatorContext.join_type().getText());			
 		}
 	}
 }

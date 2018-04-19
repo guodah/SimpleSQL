@@ -114,6 +114,18 @@ public class SimpleSQLBaseListener implements SimpleSQLListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterOuter(SimpleSQLParser.OuterContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitOuter(SimpleSQLParser.OuterContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterExpr(SimpleSQLParser.ExprContext ctx) { }
 	/**
 	 * {@inheritDoc}

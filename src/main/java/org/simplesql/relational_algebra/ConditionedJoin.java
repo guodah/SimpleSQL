@@ -6,19 +6,24 @@ import java.util.List;
 import org.simplesql.iterators.Row;
 import org.simplesql.resolve.SchemaResolver;
 
-public class InnerJoin extends Join{
+public class ConditionedJoin extends Join{
 	private BooleanBinaryExpression joinCondition;
+	private boolean inner; // true: inner join, false: right join
 
-
-	public InnerJoin(Relation left, Relation right, BooleanBinaryExpression joinCondition) {
+	public ConditionedJoin(Relation left, Relation right, boolean inner, BooleanBinaryExpression joinCondition) {
 		super(left, right);
 		this.joinCondition = joinCondition;
+		this.inner = inner; 
 		
 		if(joinCondition==null){
 			throw new IllegalStateException("inner join without condition not supported");
 		}
 	}
 
+	public boolean isInnerJoin(){
+		return inner;
+	}
+	
 	public BooleanBinaryExpression getJoinCondition(){
 		return joinCondition;
 	}

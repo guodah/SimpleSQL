@@ -1,7 +1,7 @@
 package org.simplesql.iterators;
 
 import org.simplesql.relational_algebra.Relation;
-import org.simplesql.relational_algebra.InnerJoin;
+import org.simplesql.relational_algebra.ConditionedJoin;
 import org.simplesql.relational_algebra.Join;
 import org.simplesql.relational_algebra.NaturalJoin;
 import org.simplesql.resolve.SchemaResolver;
@@ -36,8 +36,8 @@ public class JoinIteratorBuilder {
 			}else {
 				return new NaturalJoinHashItrator((NaturalJoin)join, left, right);
 			}
-		}else if(join instanceof InnerJoin){
-			return new InnerJoinNestedLoopIterator((InnerJoin)join, left, right);
+		}else if(join instanceof ConditionedJoin){
+			return new ConditionedJoinNestedLoopIterator((ConditionedJoin)join, left, right);
 		}else {
 			throw new IllegalStateException("unsupported join "+join.getClass());
 		}

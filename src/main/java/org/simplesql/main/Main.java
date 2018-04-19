@@ -46,9 +46,11 @@ public class Main {
 
 //		execute("schema/test.json", "sELECT a, b,c,d  FROM (select a, b,c,d from testtablea)");
 		
-		execute("schema/test.json", "select a+1, b*2+c, c+d from testtablea where a+3>=2*d-1");
+//		execute("schema/test.json", "select a+1, b*2+c, c+d from testtablea where a+3>=2*d-1");
 		
 //		execute("schema/test.json", "SELECT a, b, c, d from testtableA where a>=2 and c>=5;");
+		execute("schema/test.json", "sELECT testtableA.a, testtableA.b, testtableB.a, testtableB.b"+
+				" FROM testtableA right join testtableB on testtableA.a<testtableB.a and testtableA.b>testtableB.b;");
 	}
 
 	private static void execute(String schemaPath, String sql) throws IOException {

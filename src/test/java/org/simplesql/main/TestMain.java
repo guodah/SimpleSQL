@@ -7,8 +7,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -34,6 +36,72 @@ public class TestMain {
 		SimpleSQL.setSchema(new File(SCHEMA).toURI().toURL());
 	}
 	
+	@Test
+	public void testLeftOuterJoin1() throws IOException{
+		List<String> result = execute("sELECT testtableA.a, testtableA.b, testtableB.a, testtableB.b"+
+				" FROM testtableA left join testtableB on testtableA.a<testtableB.a and testtableA.b>testtableB.b;");
+		assertNotNull(result);
+		assertEquals(result.size(), 7);
+		
+		Map<String, Integer> counts = count(result);
+		
+		assertEquals(counts.size(), 4);
+		assertEquals(counts.get("{TESTTABLEA.A=1, TESTTABLEA.B=1, TESTTABLEB.A=null, TESTTABLEB.B=null}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=1, TESTTABLEA.B=2, TESTTABLEB.A=2, TESTTABLEB.B=1}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=2, TESTTABLEA.B=3, TESTTABLEB.A=null, TESTTABLEB.B=null}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=2, TESTTABLEA.B=4, TESTTABLEB.A=null, TESTTABLEB.B=null}").intValue(), 1);
+	}
+
+	@Test
+	public void testLeftOuterJoin2() throws IOException{
+		List<String> result = execute("sELECT testtableA.a, testtableA.b, testtableB.a, testtableB.b"+
+				" FROM testtableA left outer join testtableB on testtableA.a<testtableB.a and testtableA.b>testtableB.b;");
+		assertNotNull(result);
+		assertEquals(result.size(), 7);
+		
+		Map<String, Integer> counts = count(result);
+		
+		assertEquals(counts.size(), 4);
+		assertEquals(counts.get("{TESTTABLEA.A=1, TESTTABLEA.B=1, TESTTABLEB.A=null, TESTTABLEB.B=null}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=1, TESTTABLEA.B=2, TESTTABLEB.A=2, TESTTABLEB.B=1}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=2, TESTTABLEA.B=3, TESTTABLEB.A=null, TESTTABLEB.B=null}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=2, TESTTABLEA.B=4, TESTTABLEB.A=null, TESTTABLEB.B=null}").intValue(), 1);
+	}
+
+	@Test
+	public void testRightOuterJoin1() throws IOException{
+		List<String> result = execute("sELECT testtableA.a, testtableA.b, testtableB.a, testtableB.b"+
+				" FROM testtableA right join testtableB on testtableA.a<testtableB.a and testtableA.b>testtableB.b;");
+
+		assertNotNull(result);
+		assertEquals(result.size(), 9);
+		
+		Map<String, Integer> counts = count(result);
+		
+		assertEquals(counts.size(), 5);
+		assertEquals(counts.get("{TESTTABLEA.A=null, TESTTABLEA.B=null, TESTTABLEB.A=1, TESTTABLEB.B=1}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=null, TESTTABLEA.B=null, TESTTABLEB.A=1, TESTTABLEB.B=2}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=null, TESTTABLEA.B=null, TESTTABLEB.A=2, TESTTABLEB.B=3}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=1, TESTTABLEA.B=2, TESTTABLEB.A=2, TESTTABLEB.B=1}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=null, TESTTABLEA.B=null, TESTTABLEB.A=2, TESTTABLEB.B=4}").intValue(), 1);
+	}
+
+	@Test
+	public void testRightOuterJoin2() throws IOException{
+		List<String> result = execute("sELECT testtableA.a, testtableA.b, testtableB.a, testtableB.b"+
+				" FROM testtableA right outer join testtableB on testtableA.a<testtableB.a and testtableA.b>testtableB.b;");
+		assertNotNull(result);
+		assertEquals(result.size(), 9);
+		
+		Map<String, Integer> counts = count(result);
+		
+		assertEquals(counts.size(), 5);
+		assertEquals(counts.get("{TESTTABLEA.A=null, TESTTABLEA.B=null, TESTTABLEB.A=1, TESTTABLEB.B=1}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=null, TESTTABLEA.B=null, TESTTABLEB.A=1, TESTTABLEB.B=2}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=null, TESTTABLEA.B=null, TESTTABLEB.A=2, TESTTABLEB.B=3}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=1, TESTTABLEA.B=2, TESTTABLEB.A=2, TESTTABLEB.B=1}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=null, TESTTABLEA.B=null, TESTTABLEB.A=2, TESTTABLEB.B=4}").intValue(), 1);
+	}
 	
 	@Test
 	public void testInnerJoin() throws IOException{
@@ -118,25 +186,17 @@ public class TestMain {
 	@Test 
 	public void testNumericExpressionInFilter()throws IOException{
 		List<String> result = execute("select a+1, b*2+c, c+d from testtablea where a+3>=2*d-1");
-		System.out.println(result);
 		assertNotNull(result);
 		assertEquals(result.size(), 1);
 		assertTrue(result.contains("{TESTTABLEA.A + 1=2, TESTTABLEA.B * 2 + TESTTABLEA.C=6, TESTTABLEA.C + TESTTABLEA.D=6}"));
 	}
 	
 	private List<String> execute(String sql) throws IOException {
-		CharStream input = CharStreams.fromStream(new ByteArrayInputStream(sql.toUpperCase().getBytes()));
-		SimpleSQLLexer lexer = new SimpleSQLLexer(input);
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		SimpleSQLParser parser = new SimpleSQLParser(tokens);
-
-		Project project = parseTreeToRelAlg(parser);
-
-		ProjectIterator projectIterator = IteratorBuilder.buildRelationIterator(project, false);
-		return buildSet(projectIterator);
+		Iterator<Row> iterator = SimpleSQL.executeQuery(sql);
+		return buildList(iterator);
 	}
 
-	private List<String> buildSet(Iterator<Row> iterator) {
+	private List<String> buildList(Iterator<Row> iterator) {
 		List<String> result = new ArrayList<>();
 		while(iterator.hasNext()){
 			Row row = iterator.next();
@@ -150,5 +210,11 @@ public class TestMain {
 		return result;
 	}
 
-	
+	private Map<String, Integer> count(List<String> result) {
+		Map<String, Integer> counts = new HashMap<>();
+		for(String each:result){
+			counts.put(each, counts.getOrDefault(each, 0)+1);
+		}
+		return counts;
+	}	
 }

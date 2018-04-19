@@ -25,8 +25,12 @@ abstract public class Join extends Relation{
 		if(joinMethod.equals("NATURAL")){
 			return new NaturalJoin(left, right);
 		}else if(joinMethod.equals("INNER")){
-			return new InnerJoin(left, right, expression);
-		}else{
+			return new ConditionedJoin(left, right, true, expression);
+		}else if(joinMethod.equals("LEFT")){
+			return new ConditionedJoin(left, right, false, expression);
+		}else if(joinMethod.equals("RIGHT")){
+			return new ConditionedJoin(right, left, false, expression);
+		}else {
 			throw new IllegalStateException("unsupported join: "+joinMethod);
 		}
 	}

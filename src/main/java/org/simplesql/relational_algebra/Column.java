@@ -62,7 +62,7 @@ public class Column extends Expression<LiteralValue>{
 	@Override
 	public Table locateColumn(String column){
 		if(column.equals(columnName)){
-			return new Table(tableName);
+			return tableName==null?null:new Table(tableName);
 		}else{
 			return null;
 		}

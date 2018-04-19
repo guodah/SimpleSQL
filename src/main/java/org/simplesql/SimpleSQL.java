@@ -30,7 +30,7 @@ public class SimpleSQL {
 		return resolver;
 	}
 	
-	private static Iterator executeQuery(String sql) throws IOException {
+	public static Iterator<Row> executeQuery(String sql) throws IOException {
 		if(resolver==null){
 			throw new IllegalStateException("schema not set");
 		}

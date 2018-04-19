@@ -8,6 +8,7 @@ import java.util.Set;
 import org.simplesql.relational_algebra.DoubleValue;
 import org.simplesql.relational_algebra.LiteralValue;
 import org.simplesql.relational_algebra.LongValue;
+import org.simplesql.relational_algebra.NullValue;
 import org.simplesql.relational_algebra.StringValue;
 import org.simplesql.resolve.SchemaResolver;
 
@@ -95,5 +96,17 @@ public class Row {
 			row.put(field, row2.fields.get(field));
 		}
 		return row;
+	}
+
+	public static Row combine(Row row1, Row row2, boolean fillRightNull) {
+		Row row = new Row();
+		for(String field:row1.fields.keySet()){
+			row.put(field, row1.fields.get(field));
+		}
+
+		for(String field:row2.fields.keySet()){
+			row.put(field, NullValue.NULL);
+		}
+		return row;		
 	}
 }

@@ -24,7 +24,9 @@ join_operator: join_type JOIN;
 
 table_name: ANY_NAME;
 
-join_type: NATURAL | INNER;
+join_type: outer | NATURAL | INNER;
+
+outer: (LEFT | RIGHT) OUTER* ;
 
 expr: 
      literal_value  
@@ -84,7 +86,9 @@ MUL : '*';
 DIV : '/';
 
 
-
+LEFT: L E F T;
+RIGHT: R I G H T;
+OUTER: O U T E R;
 ON: O N;
 NATURAL: N A T U R A L;
 INNER: I N N E R;
