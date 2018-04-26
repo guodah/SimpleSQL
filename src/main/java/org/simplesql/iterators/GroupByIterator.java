@@ -68,7 +68,7 @@ public class GroupByIterator implements Iterator<Row> {
 
 	private void buildGroups() {
 		List<Column> columns = groupBy.getColumns();
-		List<Aggregate> buckets = groupBy.getAggregates();
+		List<Aggregate<?>> buckets = groupBy.getAggregates();
 		
 		while(downStream.hasNext()){
 			Row row = downStream.next();
@@ -76,7 +76,7 @@ public class GroupByIterator implements Iterator<Row> {
 		}
 	}
 
-	private void buildBuckets(List<Column> columns, Row row, List<Aggregate> buckets) {
+	private void buildBuckets(List<Column> columns, Row row, List<Aggregate<?>> buckets) {
 		Map<Object, Object> tmap = map;
 		for(int i=0;i<columns.size();i++){
 			String field = columns.get(i).toString();
@@ -93,7 +93,7 @@ public class GroupByIterator implements Iterator<Row> {
 				}
 			}else{
 				if(i==columns.size()-1){
-					buckets = (List<Aggregate>) tmap.get(value);
+					buckets = (List<Aggregate<?>>) tmap.get(value);
 				}else{
 					tmap = (Map<Object, Object>) tmap.get(value);
 				}
@@ -110,9 +110,9 @@ public class GroupByIterator implements Iterator<Row> {
 		}
 	}
 
-	List<Aggregate> duplicate(List<Aggregate> aggregates){
-		List<Aggregate> res = new ArrayList<Aggregate>();
-		for(Aggregate each:aggregates){
+	List<Aggregate<?>> duplicate(List<Aggregate<?>> buckets){
+		List<Aggregate<?>> res = new ArrayList<Aggregate<?>>();
+		for(Aggregate<?> each:buckets){
 			res.add(each.duplicate());
 		}
 		return res;

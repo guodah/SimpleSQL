@@ -9,6 +9,7 @@ import java.util.List;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.simplesql.QueryOptimizer;
 import org.simplesql.SimpleSQL;
 import org.simplesql.iterators.IteratorBuilder;
 import org.simplesql.iterators.ProjectIterator;
@@ -49,8 +50,12 @@ public class Main {
 //		execute("schema/test.json", "select a+1, b*2+c, c+d from testtablea where a+3>=2*d-1");
 		
 //		execute("schema/test.json", "SELECT a, b, c, d from testtableA where a>=2 and c>=5;");
-		execute("schema/test.json", "sELECT testtableA.a, testtableA.b, testtableB.a, testtableB.b"+
-				" FROM testtableA right join testtableB on testtableA.a<testtableB.a and testtableA.b>testtableB.b;");
+//		execute("schema/test.json", "sELECT a, b, sum(c), count(*) FROM testtableA  natural join testtableB "+
+//				"where a>1 and b>2 GROUP BY a,b;");
+		
+//		execute("schema/test.json", "select testtablea.a, e from (select a, b, c,d from testtablea)"
+//				+ " inner join testtableB on testtableA.b = testtableB.b where c>2");
+		execute("schema/test.json", "select testtablea.a from testtableA inner join testtableB on testtableA.b = testtableB.b");
 	}
 
 	private static void execute(String schemaPath, String sql) throws IOException {
@@ -60,6 +65,13 @@ public class Main {
 		SimpleSQLParser parser = new SimpleSQLParser(tokens);
 
 		Project project = parseTreeToRelAlg(parser);
+
+		System.out.println(project);
+		
+		QueryOptimizer optimizer = new QueryOptimizer();
+		optimizer.setRoot(project);
+		optimizer.optimize();
+		
 		System.out.println(project);
 		
 		ProjectIterator projectIterator = IteratorBuilder.buildRelationIterator(project, false);

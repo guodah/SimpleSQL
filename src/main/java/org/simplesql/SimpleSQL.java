@@ -18,6 +18,8 @@ import org.simplesql.iterators.Row;
 import org.simplesql.parse.SimpleSQLLexer;
 import org.simplesql.parse.SimpleSQLParser;
 import org.simplesql.relational_algebra.Project;
+import org.simplesql.relational_algebra.RANode;
+import org.simplesql.relational_algebra.Relation;
 import org.simplesql.resolve.SchemaResolver;
 
 public class SimpleSQL {
@@ -30,7 +32,20 @@ public class SimpleSQL {
 		return resolver;
 	}
 	
+	public static Relation optimize(Relation relation){
+		QueryOptimizer optimizer = new QueryOptimizer();
+		optimizer.setRoot(relation);
+		return optimizer.optimize();
+	}
+	
 	public static Iterator<Row> executeQuery(String sql) throws IOException {
+		Project project = findProjectNode(sql);
+		ProjectIterator projectIterator = IteratorBuilder.buildRelationIterator(
+				project, false);
+		return projectIterator;
+	}
+	
+	public static Project findProjectNode(String sql) throws IOException{
 		if(resolver==null){
 			throw new IllegalStateException("schema not set");
 		}
@@ -41,9 +56,6 @@ public class SimpleSQL {
 		SimpleSQLParser parser = new SimpleSQLParser(tokens);
 
 		Project project = parseTreeToRelAlg(parser);
-
-		ProjectIterator projectIterator = IteratorBuilder.buildRelationIterator(
-				project, false);
-		return projectIterator;
+		return project;
 	}
 }

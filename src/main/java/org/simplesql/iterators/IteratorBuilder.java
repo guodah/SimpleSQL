@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URL;
 
 import org.simplesql.relational_algebra.Relation;
+import org.simplesql.relational_algebra.SimpleProject;
 import org.simplesql.SimpleSQL;
 import org.simplesql.relational_algebra.Join;
 import org.simplesql.relational_algebra.NaturalJoin;
@@ -16,20 +17,20 @@ public class IteratorBuilder {
 
 	
 	public static ProjectIterator buildRelationIterator(Project project, boolean sort)
-		throws IOException{
+			throws IOException{
 		Iterator<Row> iterator = buildRelationIterator(project.getRelation(), sort);
 		if(project.getFilter()!=null){
 			FilterIterator filterIterator = new FilterIterator(iterator, project.getFilter());
 			iterator = filterIterator;
 		}
-		
+			
 		if(project.getGroupBy()!=null){
 			iterator = new GroupByIterator(project.getGroupBy(), iterator);
 		}
-		
-		return new ProjectIterator(project, iterator);
-		
+			
+		return new ProjectIterator(project, iterator);	
 	}
+
 
 	private static Iterator<Row> buildRelationIterator(Relation relation,  boolean sort) throws IOException {
 		if(relation instanceof Table){
@@ -47,6 +48,8 @@ public class IteratorBuilder {
 					setDataSourceIterator(left, right).build();
 		}else if(relation instanceof Project){
 			return buildRelationIterator((Project)relation, sort);
+		}else if(relation instanceof SimpleProject){
+			return new SubsetCSVScanIterator((SimpleProject)relation);
 		}else{
 			throw new IllegalStateException("unsupported type of data source");
 		}

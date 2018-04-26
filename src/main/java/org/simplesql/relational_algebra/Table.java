@@ -2,7 +2,9 @@ package org.simplesql.relational_algebra;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.simplesql.SimpleSQL;
 import org.simplesql.resolve.SchemaResolver;
@@ -25,13 +27,10 @@ public class Table extends Relation{
 	}
 	@Override
 	public List<Expression<?>> getColumns() {
-		if(!SimpleSQL.getSchemaResolver().validateTable(tableName)){
-			throw new IllegalStateException("Table "+tableName+" not found.");
-		}
-		return new ArrayList<>(SimpleSQL.getSchemaResolver().findColumns(tableName));
+		return new ArrayList<>(getReferencedColumns());
 	}
 	@Override
-	public Table locateColumn(String column) {
+	public Table locateColumnBySimpleName(String column) {
 		List<? extends Expression<?>> columns = getColumns();
 		for(Expression<?> each: columns){
 			if(((Column)each).getSimpleName().equals(column)){
@@ -39,5 +38,12 @@ public class Table extends Relation{
 			}
 		}
 		return null;
+	}
+	@Override
+	public Set<Column> getReferencedColumns() {
+		if(!SimpleSQL.getSchemaResolver().validateTable(tableName)){
+			throw new IllegalStateException("Table "+tableName+" not found.");
+		}
+		return new HashSet<>(SimpleSQL.getSchemaResolver().findColumns(tableName));
 	}
 }

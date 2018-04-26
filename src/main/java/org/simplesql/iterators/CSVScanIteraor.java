@@ -47,6 +47,4 @@ public class CSVScanIteraor implements ScanIterator{
 			throw new IllegalStateException("Unable to reopen "+ csvFile);
 		}
 	}
-
-	
 }

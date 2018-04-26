@@ -1,7 +1,9 @@
 package org.simplesql.relational_algebra;
 
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.simplesql.iterators.Row;
 import org.simplesql.resolve.SchemaResolver;
@@ -36,7 +38,7 @@ public class ConditionedJoin extends Join{
 
 	@Override
 	public List<Expression<?>> getColumns() {
-		List<Expression<?>> columns = left.getColumns();
+		List<Expression<?>> columns = new ArrayList<>(left.getColumns());
 		columns.addAll(right.getColumns());
 		return columns;
 	}
@@ -46,7 +48,7 @@ public class ConditionedJoin extends Join{
 	}
 
 	@Override
-	public Table locateColumn(String column) {
+	public Table locateColumnBySimpleName(String column) {
 		List<Expression<?>> columns = getColumns();
 		Table table = null;
 		for(Expression<?> each:columns){
@@ -65,5 +67,10 @@ public class ConditionedJoin extends Join{
 	public boolean evaluateJoinCondition(Row row1, Row row2){
 		Row superRow = Row.combine(row1, row2);
 		return this.joinCondition.evaluate(superRow);
+	}
+	
+	@Override
+	public Set<Column> getReferencedColumns(){
+		return joinCondition.getReferencedColumns();
 	}
 }

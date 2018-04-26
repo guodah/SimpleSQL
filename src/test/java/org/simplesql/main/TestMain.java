@@ -38,40 +38,59 @@ public class TestMain {
 	
 	@Test
 	public void testLeftOuterJoin1() throws IOException{
-		List<String> result = execute("sELECT testtableA.a, testtableA.b, testtableB.a, testtableB.b"+
-				" FROM testtableA left join testtableB on testtableA.a<testtableB.a and testtableA.b>testtableB.b;");
+		List<String> result = execute(
+				"sELECT testtableA.a, testtableA.b, "
+				+ "testtableB.a, testtableB.b"+
+				" FROM testtableA left join testtableB on testtableA.a<testtableB.a"
+				+ " and testtableA.b>testtableB.b;"
+		);
+		
 		assertNotNull(result);
 		assertEquals(result.size(), 7);
 		
 		Map<String, Integer> counts = count(result);
 		
 		assertEquals(counts.size(), 4);
-		assertEquals(counts.get("{TESTTABLEA.A=1, TESTTABLEA.B=1, TESTTABLEB.A=null, TESTTABLEB.B=null}").intValue(), 2);
-		assertEquals(counts.get("{TESTTABLEA.A=1, TESTTABLEA.B=2, TESTTABLEB.A=2, TESTTABLEB.B=1}").intValue(), 2);
-		assertEquals(counts.get("{TESTTABLEA.A=2, TESTTABLEA.B=3, TESTTABLEB.A=null, TESTTABLEB.B=null}").intValue(), 2);
-		assertEquals(counts.get("{TESTTABLEA.A=2, TESTTABLEA.B=4, TESTTABLEB.A=null, TESTTABLEB.B=null}").intValue(), 1);
+		assertEquals(counts.get("{TESTTABLEA.A=1, TESTTABLEA.B=1, "
+								+ "TESTTABLEB.A=null, TESTTABLEB.B=null}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=1, TESTTABLEA.B=2, "
+								+ "TESTTABLEB.A=2, TESTTABLEB.B=1}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=2, TESTTABLEA.B=3, "
+								+ "TESTTABLEB.A=null, TESTTABLEB.B=null}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=2, TESTTABLEA.B=4, "
+								+ "TESTTABLEB.A=null, TESTTABLEB.B=null}").intValue(), 1);
 	}
 
 	@Test
 	public void testLeftOuterJoin2() throws IOException{
-		List<String> result = execute("sELECT testtableA.a, testtableA.b, testtableB.a, testtableB.b"+
-				" FROM testtableA left outer join testtableB on testtableA.a<testtableB.a and testtableA.b>testtableB.b;");
+		List<String> result = execute(
+				"sELECT testtableA.a, testtableA.b, "
+				+ "testtableB.a, testtableB.b FROM testtableA left outer join "
+				+ "testtableB on testtableA.a<testtableB.a and testtableA.b>testtableB.b;"
+		);
+		
 		assertNotNull(result);
 		assertEquals(result.size(), 7);
 		
 		Map<String, Integer> counts = count(result);
 		
 		assertEquals(counts.size(), 4);
-		assertEquals(counts.get("{TESTTABLEA.A=1, TESTTABLEA.B=1, TESTTABLEB.A=null, TESTTABLEB.B=null}").intValue(), 2);
-		assertEquals(counts.get("{TESTTABLEA.A=1, TESTTABLEA.B=2, TESTTABLEB.A=2, TESTTABLEB.B=1}").intValue(), 2);
-		assertEquals(counts.get("{TESTTABLEA.A=2, TESTTABLEA.B=3, TESTTABLEB.A=null, TESTTABLEB.B=null}").intValue(), 2);
-		assertEquals(counts.get("{TESTTABLEA.A=2, TESTTABLEA.B=4, TESTTABLEB.A=null, TESTTABLEB.B=null}").intValue(), 1);
+		assertEquals(counts.get("{TESTTABLEA.A=1, TESTTABLEA.B=1, "
+								+ "TESTTABLEB.A=null, TESTTABLEB.B=null}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=1, TESTTABLEA.B=2, "
+								+ "TESTTABLEB.A=2, TESTTABLEB.B=1}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=2, TESTTABLEA.B=3, "
+								+ "TESTTABLEB.A=null, TESTTABLEB.B=null}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=2, TESTTABLEA.B=4, "
+								+ "TESTTABLEB.A=null, TESTTABLEB.B=null}").intValue(), 1);
 	}
 
 	@Test
 	public void testRightOuterJoin1() throws IOException{
-		List<String> result = execute("sELECT testtableA.a, testtableA.b, testtableB.a, testtableB.b"+
-				" FROM testtableA right join testtableB on testtableA.a<testtableB.a and testtableA.b>testtableB.b;");
+		List<String> result = execute(
+				"sELECT testtableA.a, testtableA.b, testtableB.a, testtableB.b "
+				+ "FROM testtableA right join testtableB "
+				+ "on testtableA.a<testtableB.a and testtableA.b>testtableB.b;");
 
 		assertNotNull(result);
 		assertEquals(result.size(), 9);
@@ -79,93 +98,142 @@ public class TestMain {
 		Map<String, Integer> counts = count(result);
 		
 		assertEquals(counts.size(), 5);
-		assertEquals(counts.get("{TESTTABLEA.A=null, TESTTABLEA.B=null, TESTTABLEB.A=1, TESTTABLEB.B=1}").intValue(), 2);
-		assertEquals(counts.get("{TESTTABLEA.A=null, TESTTABLEA.B=null, TESTTABLEB.A=1, TESTTABLEB.B=2}").intValue(), 2);
-		assertEquals(counts.get("{TESTTABLEA.A=null, TESTTABLEA.B=null, TESTTABLEB.A=2, TESTTABLEB.B=3}").intValue(), 2);
-		assertEquals(counts.get("{TESTTABLEA.A=1, TESTTABLEA.B=2, TESTTABLEB.A=2, TESTTABLEB.B=1}").intValue(), 2);
-		assertEquals(counts.get("{TESTTABLEA.A=null, TESTTABLEA.B=null, TESTTABLEB.A=2, TESTTABLEB.B=4}").intValue(), 1);
+		assertEquals(counts.get("{TESTTABLEA.A=null, TESTTABLEA.B=null, "
+								+ "TESTTABLEB.A=1, TESTTABLEB.B=1}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=null, TESTTABLEA.B=null, "
+								+ "TESTTABLEB.A=1, TESTTABLEB.B=2}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=null, TESTTABLEA.B=null, "
+								+ "TESTTABLEB.A=2, TESTTABLEB.B=3}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=1, TESTTABLEA.B=2, "
+								+ "TESTTABLEB.A=2, TESTTABLEB.B=1}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=null, TESTTABLEA.B=null, "
+								+ "TESTTABLEB.A=2, TESTTABLEB.B=4}").intValue(), 1);
 	}
 
 	@Test
 	public void testRightOuterJoin2() throws IOException{
-		List<String> result = execute("sELECT testtableA.a, testtableA.b, testtableB.a, testtableB.b"+
-				" FROM testtableA right outer join testtableB on testtableA.a<testtableB.a and testtableA.b>testtableB.b;");
+		List<String> result = execute(
+				"sELECT testtableA.a, testtableA.b, testtableB.a, testtableB.b "
+				+ "FROM testtableA right outer join testtableB "
+				+ "on testtableA.a<testtableB.a and testtableA.b>testtableB.b;"
+		);
+		
 		assertNotNull(result);
 		assertEquals(result.size(), 9);
 		
 		Map<String, Integer> counts = count(result);
 		
 		assertEquals(counts.size(), 5);
-		assertEquals(counts.get("{TESTTABLEA.A=null, TESTTABLEA.B=null, TESTTABLEB.A=1, TESTTABLEB.B=1}").intValue(), 2);
-		assertEquals(counts.get("{TESTTABLEA.A=null, TESTTABLEA.B=null, TESTTABLEB.A=1, TESTTABLEB.B=2}").intValue(), 2);
-		assertEquals(counts.get("{TESTTABLEA.A=null, TESTTABLEA.B=null, TESTTABLEB.A=2, TESTTABLEB.B=3}").intValue(), 2);
-		assertEquals(counts.get("{TESTTABLEA.A=1, TESTTABLEA.B=2, TESTTABLEB.A=2, TESTTABLEB.B=1}").intValue(), 2);
-		assertEquals(counts.get("{TESTTABLEA.A=null, TESTTABLEA.B=null, TESTTABLEB.A=2, TESTTABLEB.B=4}").intValue(), 1);
+		assertEquals(counts.get("{TESTTABLEA.A=null, TESTTABLEA.B=null, "
+								+ "TESTTABLEB.A=1, TESTTABLEB.B=1}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=null, TESTTABLEA.B=null, "
+								+ "TESTTABLEB.A=1, TESTTABLEB.B=2}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=null, TESTTABLEA.B=null, "
+								+ "TESTTABLEB.A=2, TESTTABLEB.B=3}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=1, TESTTABLEA.B=2, "
+								+ "TESTTABLEB.A=2, TESTTABLEB.B=1}").intValue(), 2);
+		assertEquals(counts.get("{TESTTABLEA.A=null, TESTTABLEA.B=null, "
+								+ "TESTTABLEB.A=2, TESTTABLEB.B=4}").intValue(), 1);
 	}
 	
 	@Test
 	public void testInnerJoin() throws IOException{
-		List<String> result = execute("sELECT testtableA.a, testtableA.b, testtableB.a, testtableB.b FROM testtableA "+
-				"inner join testtableB on testtableA.a<testtableB.a and testtableA.b>testtableB.b;");
+		List<String> result = execute(
+				"sELECT testtableA.a, testtableA.b, testtableB.a, testtableB.b "
+				+ "FROM testtableA inner join testtableB "
+				+ "on testtableA.a<testtableB.a and testtableA.b>testtableB.b;");
 		assertNotNull(result);
 		assertEquals(result.size(),2);
 		assertEquals(new HashSet<String>(result).size(),1);
-		assertTrue(result.contains("{TESTTABLEA.A=1, TESTTABLEA.B=2, TESTTABLEB.A=2, TESTTABLEB.B=1}"));
+		assertTrue(result.contains("{TESTTABLEA.A=1, TESTTABLEA.B=2, "
+									+ "TESTTABLEB.A=2, TESTTABLEB.B=1}"));
 	}
 	
 	@Test
 	public void testFilter() throws IOException{
-		List<String> result = execute("SELECT a, b, c, d from testtableA where a>=2 and c>=5;");
+		List<String> result = execute(
+				"SELECT a, b, c, d "
+				+ "from testtableA "
+				+ "where a>=2 and c>=5;"
+		);
+		
 		assertNotNull(result);
 		assertEquals(result.size(), 2);
-		assertTrue(result.contains("{TESTTABLEA.A=2, TESTTABLEA.B=3, TESTTABLEA.C=8, TESTTABLEA.D=4}"));
-		assertTrue(result.contains("{TESTTABLEA.A=2, TESTTABLEA.B=4, TESTTABLEA.C=5, TESTTABLEA.D=10}"));
+		assertTrue(result.contains("{TESTTABLEA.A=2, TESTTABLEA.B=3, "
+									+ "TESTTABLEA.C=8, TESTTABLEA.D=4}"));
+		assertTrue(result.contains("{TESTTABLEA.A=2, TESTTABLEA.B=4, "
+									+ "TESTTABLEA.C=5, TESTTABLEA.D=10}"));
 	}
 	
 	@Test
 	public void testNaturalJoin() throws IOException{
-		List<String> result = execute("sELECT a, b,c,d,e,  g FROM testtableA natural join testtableB "+
-				"natural join testtableC where b>3;");
+		List<String> result = execute(
+				"sELECT a, b,c,d,e,  g "
+				+ "FROM testtableA natural join testtableB "+
+									"natural join testtableC "
+				+ "where b>3;"
+		);
 
 		assertNotNull(result);
 		assertEquals(result.size(), 1);
-		assertTrue(result.contains("{TESTTABLEA.A=2, TESTTABLEA.B=4, TESTTABLEA.C=5, TESTTABLEA.D=10, TESTTABLEB.E=10, TESTTABLEC.G=5}"));
+		assertTrue(result.contains("{TESTTABLEA.A=2, TESTTABLEA.B=4, TESTTABLEA.C=5, "
+									+ "TESTTABLEA.D=10, TESTTABLEB.E=10, TESTTABLEC.G=5}"));
 	}
 
 	@Test
 	public void testSubqueryWithNaturalJoin() throws IOException{
-		List<String> result = execute("sELECT a, b,c,d,e,  g FROM (select a, b,c,d from testtablea) natural join testtableB "+
-				"natural join testtableC where b>3;");
+		List<String> result = execute(
+				"sELECT a, b,c,d,e,  g "
+				+ "FROM (select a, b,c,d from testtablea) natural join testtableB "+
+								"natural join testtableC "
+								+ "where b>3;"
+		);
 
 		assertNotNull(result);
 		assertEquals(result.size(), 1);
-		assertTrue(result.contains("{TESTTABLEA.A=2, TESTTABLEA.B=4, TESTTABLEA.C=5, TESTTABLEA.D=10, TESTTABLEB.E=10, TESTTABLEC.G=5}"));
+		assertTrue(result.contains("{TESTTABLEA.A=2, TESTTABLEA.B=4, TESTTABLEA.C=5, "
+									+ "TESTTABLEA.D=10, TESTTABLEB.E=10, TESTTABLEC.G=5}"));
 	}
 	
 	@Test
 	public void testGroupBy() throws IOException{
-		List<String> result = execute("sELECT a, b, sum(c), count(*) FROM testtableA  natural join testtableB "+
-				"where a>1 and b>2 GROUP BY a,b;");
+		List<String> result = execute(
+				"sELECT a, b, sum(c), count(*) "
+				+ "FROM testtableA  natural join testtableB "+
+				"where a>1 and b>2 GROUP BY a,b;"
+		);
+		
 		assertNotNull(result);
 		assertEquals(result.size(),2);
-		assertTrue(result.contains("{COUNT(*)=4, SUM(TESTTABLEA.C)=24, TESTTABLEA.A=2, TESTTABLEA.B=3}"));
-		assertTrue(result.contains("{COUNT(*)=1, SUM(TESTTABLEA.C)=5, TESTTABLEA.A=2, TESTTABLEA.B=4}"));
+		assertTrue(result.contains("{COUNT(*)=4, SUM(TESTTABLEA.C)=24, "
+									+ "TESTTABLEA.A=2, TESTTABLEA.B=3}"));
+		assertTrue(result.contains("{COUNT(*)=1, SUM(TESTTABLEA.C)=5, "
+									+ "TESTTABLEA.A=2, TESTTABLEA.B=4}"));
 	}
 
 	@Test
 	public void testSubqueryNoJoin() throws IOException{
-		List<String> result = execute("sELECT a, b,c,d  FROM (select a, b,c,d from testtablea);");
+		List<String> result = execute(
+				"sELECT a, b,c,d  "
+				+ "FROM (select a, b,c,d from testtablea);");
 		
 		assertNotNull(result);
 		assertEquals(result.size(), 7);
 		
-		assertTrue(result.contains("{TESTTABLEA.A=1, TESTTABLEA.B=1, TESTTABLEA.C=2, TESTTABLEA.D=4}"));
-		assertTrue(result.contains("{TESTTABLEA.A=1, TESTTABLEA.B=1, TESTTABLEA.C=4, TESTTABLEA.D=2}"));
-		assertTrue(result.contains("{TESTTABLEA.A=1, TESTTABLEA.B=2, TESTTABLEA.C=3, TESTTABLEA.D=6}"));
-		assertTrue(result.contains("{TESTTABLEA.A=1, TESTTABLEA.B=2, TESTTABLEA.C=6, TESTTABLEA.D=3}"));	
-		assertTrue(result.contains("{TESTTABLEA.A=2, TESTTABLEA.B=3, TESTTABLEA.C=4, TESTTABLEA.D=8}"));
-		assertTrue(result.contains("{TESTTABLEA.A=2, TESTTABLEA.B=3, TESTTABLEA.C=8, TESTTABLEA.D=4}"));
-		assertTrue(result.contains("{TESTTABLEA.A=2, TESTTABLEA.B=4, TESTTABLEA.C=5, TESTTABLEA.D=10}"));
+		assertTrue(result.contains("{TESTTABLEA.A=1, TESTTABLEA.B=1, "
+									+ "TESTTABLEA.C=2, TESTTABLEA.D=4}"));
+		assertTrue(result.contains("{TESTTABLEA.A=1, TESTTABLEA.B=1, "
+									+ "TESTTABLEA.C=4, TESTTABLEA.D=2}"));
+		assertTrue(result.contains("{TESTTABLEA.A=1, TESTTABLEA.B=2, "
+									+ "TESTTABLEA.C=3, TESTTABLEA.D=6}"));
+		assertTrue(result.contains("{TESTTABLEA.A=1, TESTTABLEA.B=2, "
+									+ "TESTTABLEA.C=6, TESTTABLEA.D=3}"));	
+		assertTrue(result.contains("{TESTTABLEA.A=2, TESTTABLEA.B=3, "
+									+ "TESTTABLEA.C=4, TESTTABLEA.D=8}"));
+		assertTrue(result.contains("{TESTTABLEA.A=2, TESTTABLEA.B=3, "
+									+ "TESTTABLEA.C=8, TESTTABLEA.D=4}"));
+		assertTrue(result.contains("{TESTTABLEA.A=2, TESTTABLEA.B=4, "
+									+ "TESTTABLEA.C=5, TESTTABLEA.D=10}"));
 	}
 	
 	@Test
@@ -174,21 +242,76 @@ public class TestMain {
 		
 		assertNotNull(result);
 		assertEquals(result.size(), 7);
-		assertTrue(result.contains("{TESTTABLEA.A + 1=2, TESTTABLEA.B * 2 + TESTTABLEA.C=4, TESTTABLEA.C + TESTTABLEA.D=6}"));
-		assertTrue(result.contains("{TESTTABLEA.A + 1=2, TESTTABLEA.B * 2 + TESTTABLEA.C=6, TESTTABLEA.C + TESTTABLEA.D=6}"));
-		assertTrue(result.contains("{TESTTABLEA.A + 1=2, TESTTABLEA.B * 2 + TESTTABLEA.C=7, TESTTABLEA.C + TESTTABLEA.D=9}"));
-		assertTrue(result.contains("{TESTTABLEA.A + 1=2, TESTTABLEA.B * 2 + TESTTABLEA.C=10, TESTTABLEA.C + TESTTABLEA.D=9}"));
-		assertTrue(result.contains("{TESTTABLEA.A + 1=3, TESTTABLEA.B * 2 + TESTTABLEA.C=10, TESTTABLEA.C + TESTTABLEA.D=12}"));
-		assertTrue(result.contains("{TESTTABLEA.A + 1=3, TESTTABLEA.B * 2 + TESTTABLEA.C=14, TESTTABLEA.C + TESTTABLEA.D=12}"));
-		assertTrue(result.contains("{TESTTABLEA.A + 1=3, TESTTABLEA.B * 2 + TESTTABLEA.C=13, TESTTABLEA.C + TESTTABLEA.D=15}"));
+		assertTrue(result.contains("{TESTTABLEA.A + 1=2, "
+									+ "TESTTABLEA.B * 2 + TESTTABLEA.C=4, "
+									+ "TESTTABLEA.C + TESTTABLEA.D=6}"));
+		assertTrue(result.contains("{TESTTABLEA.A + 1=2, "
+									+ "TESTTABLEA.B * 2 + TESTTABLEA.C=6, "
+									+ "TESTTABLEA.C + TESTTABLEA.D=6}"));
+		assertTrue(result.contains("{TESTTABLEA.A + 1=2, "
+									+ "TESTTABLEA.B * 2 + TESTTABLEA.C=7, "
+									+ "TESTTABLEA.C + TESTTABLEA.D=9}"));
+		assertTrue(result.contains("{TESTTABLEA.A + 1=2, "
+									+ "TESTTABLEA.B * 2 + TESTTABLEA.C=10, "
+									+ "TESTTABLEA.C + TESTTABLEA.D=9}"));
+		assertTrue(result.contains("{TESTTABLEA.A + 1=3, "
+									+ "TESTTABLEA.B * 2 + TESTTABLEA.C=10, "
+									+ "TESTTABLEA.C + TESTTABLEA.D=12}"));
+		assertTrue(result.contains("{TESTTABLEA.A + 1=3, "
+									+ "TESTTABLEA.B * 2 + TESTTABLEA.C=14, "
+									+ "TESTTABLEA.C + TESTTABLEA.D=12}"));
+		assertTrue(result.contains("{TESTTABLEA.A + 1=3, "
+									+ "TESTTABLEA.B * 2 + TESTTABLEA.C=13, "
+									+ "TESTTABLEA.C + TESTTABLEA.D=15}"));
 	}
 	
 	@Test 
 	public void testNumericExpressionInFilter()throws IOException{
-		List<String> result = execute("select a+1, b*2+c, c+d from testtablea where a+3>=2*d-1");
+		List<String> result = execute(
+				"select a+1, b*2+c, c+d "
+				+ "from testtablea "
+				+ "where a+3>=2*d-1"
+		);
+		
 		assertNotNull(result);
 		assertEquals(result.size(), 1);
-		assertTrue(result.contains("{TESTTABLEA.A + 1=2, TESTTABLEA.B * 2 + TESTTABLEA.C=6, TESTTABLEA.C + TESTTABLEA.D=6}"));
+		assertTrue(result.contains("{TESTTABLEA.A + 1=2, "
+									+ "TESTTABLEA.B * 2 + TESTTABLEA.C=6, "
+									+ "TESTTABLEA.C + TESTTABLEA.D=6}"));
+	}
+	
+	@Test
+	public void testColumnPruneWithSubquery() throws IOException{
+		String optimizedSQL = optimize("select testtablea.a, e "
+				+ "from (select a, b, c,d from testtablea) inner join testtableB "
+				+ "on testtableA.b = testtableB.b where c>2");
+		assertNotNull(optimizedSQL);
+		assertEquals(optimizedSQL, "SELECT TESTTABLEA.A, TESTTABLEB.E "
+				+ "FROM ("
+					+ "SELECT TESTTABLEA.A, TESTTABLEA.B, TESTTABLEA.C FROM (TESTTABLEA) "
+					+ "INNER JOIN "
+					+ "SELECT TESTTABLEB.B, TESTTABLEB.E FROM (TESTTABLEB) "
+					+ "ON TESTTABLEA.B = TESTTABLEB.B) "
+				+ "WHERE TESTTABLEA.C > 2");
+	}
+
+	@Test
+	public void testColumnPrune() throws IOException{
+		String optimizedSQL = optimize("select testtablea.a "
+				+ "from testtableA inner join testtableB "
+				+ "on testtableA.b = testtableB.b");
+		assertNotNull(optimizedSQL);
+		assertEquals(optimizedSQL, "SELECT TESTTABLEA.A "
+				+ "FROM ("
+					+ "SELECT TESTTABLEA.B, TESTTABLEA.A FROM (TESTTABLEA) "
+					+ "INNER JOIN "
+					+ "SELECT TESTTABLEB.B FROM (TESTTABLEB) "
+					+ "ON TESTTABLEA.B = TESTTABLEB.B)");
+	}
+	
+	private String optimize(String sql) throws IOException{
+		Project project = SimpleSQL.findProjectNode(sql);
+		return SimpleSQL.optimize(project).toString();
 	}
 	
 	private List<String> execute(String sql) throws IOException {

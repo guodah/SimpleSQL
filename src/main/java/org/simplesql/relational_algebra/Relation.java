@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.simplesql.resolve.SchemaResolver;
 
-public abstract class Relation {
+public abstract class Relation implements RANode{
 	abstract public boolean resolve(SchemaResolver resolver, OutputStream output);
 	
 	
@@ -26,11 +26,13 @@ public abstract class Relation {
 			if(left!=null) return left;
 			Table right = findTable(((Join) dataSource).getRight(), table);
 			if(right!=null) return right;
+		}else if(dataSource instanceof Project){ // subquery
+			return findTable(((Project)dataSource).getRelation(), table);
 		}
 		return null;
 	}
 	
-	abstract public Table locateColumn(String column) ;
+	abstract public Table locateColumnBySimpleName(String column) ;
 
 
 	abstract public List<Expression<?>> getColumns();

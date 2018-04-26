@@ -1,10 +1,11 @@
 package org.simplesql.relational_algebra;
 
 import java.io.OutputStream;
+import java.util.Set;
 
-import org.simplesql.resolve.SchemaResolver;
 
-public abstract class Aggregate<T extends LiteralValue> extends Function<T>{
+public abstract class Aggregate<T extends LiteralValue> extends Function<T>
+		implements RANode{
 	protected Expression<?> column;
 
 	public Aggregate(Expression<?> column){
@@ -23,4 +24,8 @@ public abstract class Aggregate<T extends LiteralValue> extends Function<T>{
 		return column.resolve(relation, output); 
 	}
 	
+	@Override
+	public Set<Column> getReferencedColumns(){
+		return column.getReferencedColumns();		
+	}
 }

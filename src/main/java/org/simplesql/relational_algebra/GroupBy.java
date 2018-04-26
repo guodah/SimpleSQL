@@ -2,13 +2,15 @@ package org.simplesql.relational_algebra;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.simplesql.resolve.SchemaResolver;
 
-public class GroupBy {
+public class GroupBy implements RANode{
 	private List<Column> columns;
-	private List<Aggregate> aggregates;
+	private List<Aggregate<?>> aggregates;
 	
 	public GroupBy(){
 		columns = new ArrayList<>();
@@ -18,11 +20,11 @@ public class GroupBy {
 		columns.add(column);
 	}
 	
-	public void setAggregates(List<Aggregate> aggregates){
-		this.aggregates = aggregates;
+	public void setAggregates(List<Aggregate<?>> list){
+		this.aggregates = list;
 	}
 	
-	public List<Aggregate> getAggregates(){
+	public List<Aggregate<?>> getAggregates(){
 		return aggregates;
 	}
 	
@@ -34,7 +36,8 @@ public class GroupBy {
 		return columns;
 	}
 	
-	public boolean resolve(Relation dataSource, SchemaResolver resolver, OutputStream output){
+	public boolean resolve(Relation dataSource, SchemaResolver resolver, 
+			OutputStream output){
 		for(Column column:columns){
 			if(!column.resolve(dataSource, output)){
 				return false;
@@ -59,5 +62,10 @@ public class GroupBy {
 			}
 		}
 		return sb.toString();
+	}
+	
+	@Override
+	public Set<Column> getReferencedColumns(){
+		return new HashSet<>(columns);
 	}
 }

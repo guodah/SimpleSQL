@@ -1,6 +1,8 @@
 package org.simplesql.relational_algebra;
 
 import java.io.OutputStream;
+import java.util.List;
+import java.util.Set;
 
 import org.simplesql.iterators.Row;
 import org.simplesql.resolve.SchemaResolver;
@@ -37,5 +39,9 @@ public class DoubleValue extends NumericValue<Double>{
 		else
 			return false;
 	}
+	@Override
+	public Set<Column> getReferencedColumns() {
+		return null;
+	}	
 
 }

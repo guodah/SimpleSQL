@@ -1,7 +1,9 @@
 package org.simplesql.relational_algebra;
 
 import java.io.OutputStream;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.simplesql.SimpleSQL;
 import org.simplesql.iterators.Row;
@@ -48,7 +50,7 @@ public class Column extends Expression<LiteralValue>{
 			resolved = dataSource.findTable(tableName)!=null && 
 					SimpleSQL.getSchemaResolver().validateColumn(tableName, columnName);
 		}else{
-			Table table = dataSource.locateColumn(columnName);
+			Table table = dataSource.locateColumnBySimpleName(columnName);
 			tableName = table.tableName();
 			resolved = (table!=null);
 		}
@@ -57,6 +59,11 @@ public class Column extends Expression<LiteralValue>{
 	
 	private boolean isWildCard() {
 		return columnName.equals("*");
+	}
+	
+	@Override
+	public int hashCode(){
+		return getFullName().hashCode();
 	}
 	
 	@Override
@@ -79,7 +86,7 @@ public class Column extends Expression<LiteralValue>{
 	@Override
 	public boolean equals(Object c){
 		if(c instanceof Column)
-			return columnName.equals(c.toString());
+			return getFullName().equals(((Column)c).getFullName());
 		else
 			return false;
 	}
@@ -117,5 +124,12 @@ public class Column extends Expression<LiteralValue>{
 	@Override
 	public String getType() {
 		return SimpleSQL.getSchemaResolver().getType(tableName, columnName);
+	}
+
+	@Override
+	public Set<Column> getReferencedColumns() {
+		Set<Column> result = new HashSet<>();
+		result.add(this);
+		return result;
 	}	
 }

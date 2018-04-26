@@ -14,7 +14,7 @@ expr:
    | expr AND expr
 
    ;*/
-public abstract class Expression <T>{
+public abstract class Expression <T> implements RANode{
 	protected boolean resolved;
 	
 	public boolean isResolved(){

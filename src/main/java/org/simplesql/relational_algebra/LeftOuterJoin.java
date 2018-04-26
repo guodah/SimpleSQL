@@ -1,6 +1,7 @@
 package org.simplesql.relational_algebra;
 
 import java.util.List;
+import java.util.Set;
 
 public class LeftOuterJoin extends Join{
 
@@ -9,12 +10,18 @@ public class LeftOuterJoin extends Join{
 	}
 
 	@Override
-	public Table locateColumn(String column) {
+	public Table locateColumnBySimpleName(String column) {
 		return null;
 	}
 
 	@Override
 	public List<Expression<?>> getColumns() {
+		return null;
+	}
+
+	@Override
+	public Set<Column> getReferencedColumns() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

@@ -1,6 +1,8 @@
 package org.simplesql.relational_algebra;
 
 import java.io.OutputStream;
+import java.util.List;
+import java.util.Set;
 
 import org.simplesql.iterators.Row;
 import org.simplesql.resolve.SchemaResolver;
@@ -59,5 +61,9 @@ public class NullValue extends LiteralValue<Null>{
 	public String getFullName() {
 		return "NULL";
 	}
+	@Override
+	public Set<Column> getReferencedColumns() {
+		return null;
+	}	
 
 }

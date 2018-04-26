@@ -1,6 +1,10 @@
 package org.simplesql.relational_algebra;
 
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.simplesql.loggin.Logging;
 import org.simplesql.resolve.SchemaResolver;
@@ -45,4 +49,19 @@ abstract public class BinaryExpression<T> extends Expression<T>{
 		return toString();
 	}
 
+	@Override
+	public Set<Column> getReferencedColumns(){
+		Set<Column> leftColumns = left.getReferencedColumns();
+		Set<Column> rightColumns = right.getReferencedColumns();
+		
+		if(leftColumns==null){
+			return rightColumns;
+		}else if(rightColumns==null){
+			return leftColumns;
+		}
+		
+		Set<Column> result = new HashSet<>(leftColumns);
+		result.addAll(rightColumns);
+		return result;
+	}
 }

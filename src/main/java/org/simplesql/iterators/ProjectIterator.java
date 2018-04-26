@@ -53,7 +53,7 @@ public class ProjectIterator implements Iterator<Row>{
 		return project.getColumns();
 	}
 	
-	public List<Aggregate> getAggregates(){
+	public List<Aggregate<?>> getAggregates(){
 		return project.getAggregates();
 	}
 }

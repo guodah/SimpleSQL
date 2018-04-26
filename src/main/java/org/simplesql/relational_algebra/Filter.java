@@ -1,11 +1,12 @@
 package org.simplesql.relational_algebra;
 
 import java.io.OutputStream;
+import java.util.Set;
 
 import org.simplesql.iterators.Row;
 import org.simplesql.resolve.SchemaResolver;
 
-public class Filter {
+public class Filter implements RANode{
 	private BooleanBinaryExpression expression;
 	
 	public Filter(BooleanBinaryExpression expression){
@@ -25,14 +26,20 @@ public class Filter {
 	}
 	
 	public String toString(){
-		return String.format(" where %s", expression);
+		return String.format(" WHERE %s", expression);
 	}
 	
 	public boolean evaluate(Row row){
 		return expression.evaluate(row);
 	}
 	
-	public boolean resolve(Relation dataSource, SchemaResolver resolver, OutputStream output){
+	public boolean resolve(Relation dataSource, SchemaResolver resolver, 
+			OutputStream output){
 		return expression.resolve(dataSource, output);
+	}
+
+	@Override
+	public Set<Column> getReferencedColumns() {
+		return expression.getReferencedColumns();
 	}
 }

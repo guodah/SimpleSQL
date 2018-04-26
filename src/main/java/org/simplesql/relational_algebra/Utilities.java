@@ -40,12 +40,13 @@ public class Utilities {
 	}
 
 	private static Project findProject(ParseContext tree,SchemaResolver resolver){
-		Project project = new Project();
+		Project project = new Project(tree.parent==null);
 		findRelation(project, tree, resolver);
 		findFilter(project, tree);
 		findColumns(project, tree);
 		findGroupBy(project, tree);
-				
+		
+//		System.out.println(project.getRelation().getColumns());
 		if(!project.resolve(resolver, System.out)){
 			return null;
 		}else{

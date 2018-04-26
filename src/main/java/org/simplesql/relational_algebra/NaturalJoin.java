@@ -1,7 +1,9 @@
 package org.simplesql.relational_algebra;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.simplesql.resolve.SchemaResolver;
 
@@ -47,7 +49,7 @@ public class NaturalJoin extends Join{
 	}
 
 	@Override
-	public Table locateColumn(String column) {
+	public Table locateColumnBySimpleName(String column) {
 		List<? extends Expression<?>> leftColumns = left.getColumns();
 		for(Expression<?> each:leftColumns){
 			Table table = each.locateColumn(column);
@@ -64,5 +66,29 @@ public class NaturalJoin extends Join{
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public Set<Column> getReferencedColumns() {
+		List<Expression<?>> commonColumns = findCommonColumns();
+		Set<String> commonSimpleNames = new HashSet<>();
+		for(Expression<?> each:commonColumns){
+			commonSimpleNames.add(each.getSimpleName());
+		}
+
+		Set<Column> result = new HashSet<>();
+		for(Expression<?> each:left.getColumns()){
+			if(each instanceof Column && 
+					commonSimpleNames.contains(each.getSimpleName())){
+				result.add((Column)each);
+			}
+		}
+		for(Expression<?> each:right.getColumns()){
+			if(each instanceof Column && 
+					commonSimpleNames.contains(each.getSimpleName())){
+				result.add((Column)each);
+			}
+		}
+		return result;
 	}
 }

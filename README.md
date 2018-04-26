@@ -25,8 +25,43 @@ This is a project for me to experience the process of **parsing**, **compiling**
 
 **April 18, 2018**: Added code for supporting expressions as columns, like "select a+1, b*2+c, c+d from testtablea"
 
-**April 19, 2018**: Added code for left and right outer join. 
+**April 19, 2018**: Added code for left and right outer join.
 
+**April 26, 2018**: Added code for column pruning. Thus far, I understand column pruning as an optimizing process to remove columns from select clause if these columns are not referenced in the enclosing structure. For example, given the following SQL statement:
+	
+	// Table testtablea (a, b, c, d)  
+	// Table testtableb (a, b, e, f)  
+	select testtablea.a  
+	from testtableA inner join testtableB   
+	on testtableA.b = testtableB.b  
+
+In this statement, only columns a and b from testtableA and column b from testtableB are needed. So the joined tables can be replaced with select clauses as follows:
+
+	SELECT TESTTABLEA.A   
+	FROM (  
+		SELECT TESTTABLEA.B, TESTTABLEA.A FROM (TESTTABLEA)   
+		INNER JOIN  
+		SELECT TESTTABLEB.B FROM (TESTTABLEB)   
+		ON TESTTABLEA.B = TESTTABLEB.B)
+
+The next example shows pruning columns in a subquerry. It also contains a where clause:
+
+	select testtablea.a, e
+	from (select a, b, c,d from testtablea) inner join testtableB
+	on testtableA.b = testtableB.b where c>2
+
+In the subquery, columns d is unused. From testtableB, columns a and f are unused. So they can be pruned.
+
+	SELECT TESTTABLEA.A, TESTTABLEB.E
+	FROM (
+		SELECT TESTTABLEA.A, TESTTABLEA.B, TESTTABLEA.C FROM (TESTTABLEA) 
+		INNER JOIN 
+		SELECT TESTTABLEB.B, TESTTABLEB.E FROM (TESTTABLEB)
+		ON TESTTABLEA.B = TESTTABLEB.B)
+	WHERE TESTTABLEA.C > 2
+
+  
 **PLAN**:
+* implement predicate push down
 * add count distinct
 * add semi join
