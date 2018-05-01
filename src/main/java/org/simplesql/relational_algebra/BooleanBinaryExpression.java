@@ -102,5 +102,48 @@ public class BooleanBinaryExpression extends BinaryExpression <Boolean>{
 	public String getType() {
 		return "BOOLEAN";
 	}
+	
+	/**
+	 * Checks the Boolean expression is a conjunctive condition, like
+	 * A and B and C. In addition, each predicate (A, B or C) only addresses data
+	 * from one table.  
+	 * 
+	 * This method is check if the predicates in this Boolean expression can be 
+	 * pushed down to individual tables.
+	 *   
+	 * @return
+	 */
+	public boolean isConjunctiveAndSimple(){
+		if(operator.equals("OR")) return false;
+		else if(operator.equals("AND")){
+			boolean result = false;
+			if(left instanceof BooleanBinaryExpression){
+				result = ((BooleanBinaryExpression)left).isConjunctiveAndSimple();
+			}else{
+				result = left.isSimple();
+			}
+			
+			if(right instanceof BooleanBinaryExpression){
+				result = result || ((BooleanBinaryExpression)right).
+										isConjunctiveAndSimple();
+			}else{
+				result = right.isSimple();
+			}
+			return result;
+		}else{
+			return this.isSimple();
+		}
+		
+	}
 
+
+	public boolean isSinglePredicate() {
+		return !isLogicalOperator(operator);
+	}
+
+
+
+
+	
+	
 }

@@ -46,4 +46,9 @@ public class Table extends Relation{
 		}
 		return new HashSet<>(SimpleSQL.getSchemaResolver().findColumns(tableName));
 	}
+	
+	@Override
+	public boolean equals(Object obj){
+		return obj instanceof Table && tableName.equals(((Table)obj).tableName);
+	}
 }

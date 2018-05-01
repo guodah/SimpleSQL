@@ -63,5 +63,6 @@ public class StringValue extends LiteralValue<String> {
 	@Override
 	public Set<Column> getReferencedColumns() {
 		return null;
-	}	
+	}
+
 }

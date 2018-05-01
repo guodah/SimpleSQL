@@ -1,6 +1,8 @@
 package org.simplesql.relational_algebra;
 
 import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 
@@ -27,5 +29,15 @@ public abstract class Aggregate<T extends LiteralValue> extends Function<T>
 	@Override
 	public Set<Column> getReferencedColumns(){
 		return column.getReferencedColumns();		
+	}
+	
+	@Override
+	public boolean isSimple(){
+		return column.isSimple();
+	}
+	
+	@Override
+	public List<Table> getReferencedTables(){
+		return column.getReferencedTables();
 	}
 }

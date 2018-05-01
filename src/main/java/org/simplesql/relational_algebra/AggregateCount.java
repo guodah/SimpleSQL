@@ -1,6 +1,7 @@
 package org.simplesql.relational_algebra;
 
 import java.io.OutputStream;
+import java.util.List;
 
 import org.simplesql.iterators.Row;
 
@@ -64,5 +65,6 @@ public class AggregateCount extends Aggregate<LongValue> {
 	public boolean isBoolean() {
 		return false;
 	}
+
 
 }

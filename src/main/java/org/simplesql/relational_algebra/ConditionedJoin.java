@@ -44,7 +44,7 @@ public class ConditionedJoin extends Join{
 	}
 	
 	public String toString(){
-		return String.format("%s INNER JOIN %S ON %s", left, right, joinCondition.toString());
+		return String.format("(%s) INNER JOIN (%s) ON %s", left, right, joinCondition.toString());
 	}
 
 	@Override

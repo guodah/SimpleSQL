@@ -1,6 +1,7 @@
 package org.simplesql.relational_algebra;
 
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -131,5 +132,15 @@ public class Column extends Expression<LiteralValue>{
 		Set<Column> result = new HashSet<>();
 		result.add(this);
 		return result;
+	}
+
+	@Override
+	public boolean isSimple() {
+		return true;
+	}
+
+	@Override
+	public List<Table> getReferencedTables() {
+		return Arrays.asList(new Table(tableName));
 	}	
 }

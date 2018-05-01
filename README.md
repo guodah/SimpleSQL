@@ -60,8 +60,45 @@ In the subquery, columns d is unused. From testtableB, columns a and f are unuse
 		ON TESTTABLEA.B = TESTTABLEB.B)
 	WHERE TESTTABLEA.C > 2
 
-  
+**May 1, 2018**: added code for pushing down predicates. Right now, it is only able to push down predicates on a conjunctive condition on the where clause. Below is an example. 
+
+Suppose an SQL statement:
+	
+	select testtablea.a, testtableb.b 
+	from testtableA inner join (select a, b, e, f from testtableB) 
+	on testtableA.b = testtableB.b 
+	where testtableA.a>2 and testtableA.c>1 and 
+					testtableB.f<5 and testtableB.e>=2
+					
+The where clause is a conjunctive condition. The sub-conditions can be partitioned to two groups **testtableA.a>2 and testtableA.c>1** and **testtableB.f<5 and testtableB.e>=2**. They can be pushed down to the two joined tables testtableA and testtableB. Below is the rewritten SQL statement in which the previous where clause is split into two where clauses.
+
+	SELECT TESTTABLEA.A, TESTTABLEB.B 
+	FROM 
+		((SELECT TESTTABLEA.B, TESTTABLEA.A, TESTTABLEA.D, TESTTABLEA.C 
+		FROM (TESTTABLEA) 
+		WHERE TESTTABLEA.A > 2 AND TESTTABLEA.C > 1) 
+	INNER JOIN 
+		(SELECT TESTTABLEB.A, TESTTABLEB.B, TESTTABLEB.E, TESTTABLEB.F 
+		FROM (TESTTABLEB) 
+		WHERE TESTTABLEB.F < 5 AND TESTTABLEB.E >= 2) 
+	ON TESTTABLEA.B = TESTTABLEB.B)
+ 
+If performing both predicate push-down and column pruning, the rewritten query becomes the following where TESTTABLEA.D AND TESTTABLEB.A are pruned.
+
+	SELECT TESTTABLEA.A, TESTTABLEB.B 
+	FROM 
+		((SELECT TESTTABLEA.B, TESTTABLEA.A, TESTTABLEA.C 
+		FROM (TESTTABLEA) 
+		WHERE TESTTABLEA.A > 2 AND TESTTABLEA.C > 1) 
+	INNER JOIN 
+		(SELECT TESTTABLEB.B, TESTTABLEB.E, TESTTABLEB.F 
+		FROM (TESTTABLEB) 
+		WHERE TESTTABLEB.F < 5 AND TESTTABLEB.E >= 2) 
+	ON TESTTABLEA.B = TESTTABLEB.B)
+
+
 **PLAN**:
-* implement predicate push down
+* implement predicate push down for join conditions
+* support '*' as column name
 * add count distinct
 * add semi join

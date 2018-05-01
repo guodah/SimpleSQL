@@ -55,7 +55,12 @@ public class Main {
 		
 //		execute("schema/test.json", "select testtablea.a, e from (select a, b, c,d from testtablea)"
 //				+ " inner join testtableB on testtableA.b = testtableB.b where c>2");
-		execute("schema/test.json", "select testtablea.a from testtableA inner join testtableB on testtableA.b = testtableB.b");
+
+		execute("schema/test.json", "select testtablea.a, testtableb.b from testtableA inner join "
+				+ "(select a, b, e, f from testtableb) "
+				+ "on testtableA.b = testtableB.b "
+				+"where testtablea.a>2 and testtablea.c>1 and testtableb.f<5 and testtableb.e>=2");
+
 	}
 
 	private static void execute(String schemaPath, String sql) throws IOException {

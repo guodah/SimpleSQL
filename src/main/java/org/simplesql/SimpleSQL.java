@@ -32,6 +32,10 @@ public class SimpleSQL {
 		return resolver;
 	}
 	
+	public static QueryOptimizer getOptimizer(){
+		return new QueryOptimizer();
+	}
+	
 	public static Relation optimize(Relation relation){
 		QueryOptimizer optimizer = new QueryOptimizer();
 		optimizer.setRoot(relation);

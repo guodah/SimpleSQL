@@ -1,6 +1,7 @@
 package org.simplesql.relational_algebra;
 
 import java.io.OutputStream;
+import java.util.List;
 
 import org.simplesql.iterators.Row;
 import org.simplesql.resolve.SchemaResolver;
@@ -104,5 +105,9 @@ public abstract class Expression <T> implements RANode{
 	abstract public boolean isNumeric();
 
 	abstract public boolean isBoolean();
+
+	abstract public boolean isSimple();
+	
+	abstract public List<Table> getReferencedTables();
 
 }

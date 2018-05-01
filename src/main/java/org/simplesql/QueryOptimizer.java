@@ -8,6 +8,7 @@ import org.simplesql.relational_algebra.RANode;
 import org.simplesql.relational_algebra.Relation;
 import org.simplesql.relational_algebra.rules.ConvertRequest;
 import org.simplesql.relational_algebra.rules.ProjectColumnPruneRule;
+import org.simplesql.relational_algebra.rules.PushDownPredicatesRule;
 import org.simplesql.relational_algebra.rules.RARule;
 
 public class QueryOptimizer {
@@ -15,8 +16,14 @@ public class QueryOptimizer {
 	private Relation root;
 	public QueryOptimizer(){
 		rules = new ArrayList<>();
-		rules.add(ProjectColumnPruneRule.class);
+//		rules.add(PushDownPredicatesRule.class);
+//		rules.add(ProjectColumnPruneRule.class);
 		root = null;
+	}
+	
+	public void addRule(Class<? extends RARule> rule){
+		if(!rules.contains(rule))
+			rules.add(rule);
 	}
 	
 	public void setRoot(Relation root){

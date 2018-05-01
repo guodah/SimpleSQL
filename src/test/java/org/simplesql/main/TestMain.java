@@ -17,6 +17,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.Before;
 import org.junit.Test;
+import org.simplesql.QueryOptimizer;
 import org.simplesql.SimpleSQL;
 import org.simplesql.iterators.Iterator;
 import org.simplesql.iterators.IteratorBuilder;
@@ -26,14 +27,17 @@ import org.simplesql.parse.SimpleSQLLexer;
 import org.simplesql.parse.SimpleSQLParser;
 import org.simplesql.relational_algebra.LiteralValue;
 import org.simplesql.relational_algebra.Project;
+import org.simplesql.relational_algebra.rules.ProjectColumnPruneRule;
+import org.simplesql.relational_algebra.rules.PushDownPredicatesRule;
 import org.simplesql.resolve.SchemaResolver;
 
 public class TestMain {
 	private final static String SCHEMA = "schema/test.json"; 
-	
+	private QueryOptimizer optimizer;
 	@Before
 	public void setUp() throws MalformedURLException, IOException{
 		SimpleSQL.setSchema(new File(SCHEMA).toURI().toURL());
+		optimizer = SimpleSQL.getOptimizer();
 	}
 	
 	@Test
@@ -282,36 +286,129 @@ public class TestMain {
 	
 	@Test
 	public void testColumnPruneWithSubquery() throws IOException{
-		String optimizedSQL = optimize("select testtablea.a, e "
-				+ "from (select a, b, c,d from testtablea) inner join testtableB "
+		optimizer.addRule(ProjectColumnPruneRule.class);
+		String optimizedSQL = optimize(
+				"select testtablea.a, e "
+				+ "from "
+					+ "(select a, b, c,d from testtablea) "
+				+ "inner join "
+					+ "testtableB "
 				+ "on testtableA.b = testtableB.b where c>2");
 		assertNotNull(optimizedSQL);
-		assertEquals(optimizedSQL, "SELECT TESTTABLEA.A, TESTTABLEB.E "
+		assertEquals(optimizedSQL, 
+				"SELECT TESTTABLEA.A, TESTTABLEB.E "
 				+ "FROM ("
-					+ "SELECT TESTTABLEA.A, TESTTABLEA.B, TESTTABLEA.C FROM (TESTTABLEA) "
-					+ "INNER JOIN "
-					+ "SELECT TESTTABLEB.B, TESTTABLEB.E FROM (TESTTABLEB) "
-					+ "ON TESTTABLEA.B = TESTTABLEB.B) "
+					+ "(SELECT TESTTABLEA.A, TESTTABLEA.B, TESTTABLEA.C FROM (TESTTABLEA)) "
+				+ "INNER JOIN "
+					+ "(SELECT TESTTABLEB.B, TESTTABLEB.E FROM (TESTTABLEB)) "
+				+ "ON TESTTABLEA.B = TESTTABLEB.B) "
 				+ "WHERE TESTTABLEA.C > 2");
 	}
 
 	@Test
 	public void testColumnPrune() throws IOException{
-		String optimizedSQL = optimize("select testtablea.a "
-				+ "from testtableA inner join testtableB "
+		optimizer.addRule(ProjectColumnPruneRule.class);
+		String optimizedSQL = optimize(
+				"select testtablea.a "
+				+ "from "
+					+ "testtableA "
+				+ "inner join "
+					+ "testtableB "
 				+ "on testtableA.b = testtableB.b");
 		assertNotNull(optimizedSQL);
-		assertEquals(optimizedSQL, "SELECT TESTTABLEA.A "
+		assertEquals(optimizedSQL, 
+				"SELECT TESTTABLEA.A "
 				+ "FROM ("
-					+ "SELECT TESTTABLEA.B, TESTTABLEA.A FROM (TESTTABLEA) "
+					+ "(SELECT TESTTABLEA.B, TESTTABLEA.A FROM (TESTTABLEA)) "
 					+ "INNER JOIN "
-					+ "SELECT TESTTABLEB.B FROM (TESTTABLEB) "
+					+ "(SELECT TESTTABLEB.B FROM (TESTTABLEB)) "
 					+ "ON TESTTABLEA.B = TESTTABLEB.B)");
+	}
+	
+	@Test
+	public void testPredicatePushDown() throws IOException{
+		optimizer.addRule(PushDownPredicatesRule.class);
+		String optimizedSQL = optimize(
+				"select testtablea.a, testtableb.b "
+				+ "from "
+					+ "testtableA "
+				+ "inner join "
+					+ "testtableB "
+				+ "on testtableA.b = testtableB.b "
+				+"where testtablea.a>2 and testtablea.c>1 and "
+					+ "testtableb.f<5 and testtableb.e>=2");
+		assertNotNull(optimizedSQL);
+		assertEquals(optimizedSQL, 
+				"SELECT TESTTABLEA.A, TESTTABLEB.B "
+				+ "FROM "
+					+ "((SELECT TESTTABLEA.B, TESTTABLEA.A, TESTTABLEA.D, TESTTABLEA.C "
+					+ "FROM (TESTTABLEA) "
+					+ "WHERE TESTTABLEA.A > 2 AND TESTTABLEA.C > 1) "
+				+ "INNER JOIN "
+					+ "(SELECT TESTTABLEB.A, TESTTABLEB.B, TESTTABLEB.E, TESTTABLEB.F "
+					+ "FROM (TESTTABLEB) "
+					+ "WHERE TESTTABLEB.F < 5 AND TESTTABLEB.E >= 2) "
+				+ "ON TESTTABLEA.B = TESTTABLEB.B)");
+	}
+	
+	@Test
+	public void testPredicatePushDownWithSubquery() throws IOException{
+		optimizer.addRule(PushDownPredicatesRule.class);
+		String optimizedSQL = optimize(
+				"select testtablea.a, testtableb.b "
+				+ "from "
+					+ "testtableA "
+				+ "inner join "
+					+ "(select a, b, e, f from testtableb) "
+				+ "on testtableA.b = testtableB.b "
+				+"where testtablea.a>2 and testtablea.c>1 and "
+					+ "testtableb.f<5 and testtableb.e>=2");
+		assertNotNull(optimizedSQL);
+		assertEquals(optimizedSQL, 
+				"SELECT TESTTABLEA.A, TESTTABLEB.B "
+				+ "FROM "
+					+ "((SELECT TESTTABLEA.B, TESTTABLEA.A, TESTTABLEA.D, TESTTABLEA.C "
+					+ "FROM (TESTTABLEA) "
+					+ "WHERE TESTTABLEA.A > 2 AND TESTTABLEA.C > 1) "
+				+ "INNER JOIN "
+					+ "(SELECT TESTTABLEB.A, TESTTABLEB.B, TESTTABLEB.E, TESTTABLEB.F "
+					+ "FROM (TESTTABLEB) "
+					+ "WHERE TESTTABLEB.F < 5 AND TESTTABLEB.E >= 2) "
+				+ "ON TESTTABLEA.B = TESTTABLEB.B)");
+	}
+
+	@Test
+	public void testPredicatePushDownAndColumnPrune() throws IOException{
+		optimizer.addRule(PushDownPredicatesRule.class);
+		optimizer.addRule(ProjectColumnPruneRule.class);
+		String optimizedSQL = optimize(
+				"select testtablea.a, testtableb.b "
+				+ "from "
+					+ "testtableA "
+				+ "inner join "
+					+ "(select a, b, e, f from testtableb) "
+				+ "on testtableA.b = testtableB.b "
+				+"where testtablea.a>2 and testtablea.c>1 and "
+					+ "testtableb.f<5 and testtableb.e>=2");
+		assertNotNull(optimizedSQL);
+		System.out.println(optimizedSQL);
+		assertEquals(optimizedSQL, 
+				"SELECT TESTTABLEA.A, TESTTABLEB.B "
+				+ "FROM "
+					+ "((SELECT TESTTABLEA.B, TESTTABLEA.A, TESTTABLEA.C "
+					+ "FROM (TESTTABLEA) "
+					+ "WHERE TESTTABLEA.A > 2 AND TESTTABLEA.C > 1) "
+				+ "INNER JOIN "
+					+ "(SELECT TESTTABLEB.B, TESTTABLEB.E, TESTTABLEB.F "
+					+ "FROM (TESTTABLEB) "
+					+ "WHERE TESTTABLEB.F < 5 AND TESTTABLEB.E >= 2) "
+				+ "ON TESTTABLEA.B = TESTTABLEB.B)");
 	}
 	
 	private String optimize(String sql) throws IOException{
 		Project project = SimpleSQL.findProjectNode(sql);
-		return SimpleSQL.optimize(project).toString();
+		optimizer.setRoot(project);
+		return optimizer.optimize().toString();
 	}
 	
 	private List<String> execute(String sql) throws IOException {

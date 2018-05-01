@@ -64,4 +64,41 @@ abstract public class BinaryExpression<T> extends Expression<T>{
 		result.addAll(rightColumns);
 		return result;
 	}
+	
+	@Override
+	public boolean isSimple(){
+		List<Table> leftTables = left.getReferencedTables();
+		List<Table> rightTables = right.getReferencedTables();
+		
+		if(leftTables.size()>1 || rightTables.size()>1){
+			return false;
+		}else if(leftTables.size()==0 || rightTables.size()==0){
+			return true;
+		}
+		
+		Table leftTable = leftTables.get(0);
+		Table rightTable = rightTables.get(0);
+		
+		if(leftTable==null || rightTable==null){
+			return true;
+		}else{
+			return leftTable.equals(rightTable);
+		}
+	}
+	
+	@Override
+	public List<Table> getReferencedTables(){
+		List<Table> result = new ArrayList<>(left.getReferencedTables());
+		result.addAll(right.getReferencedTables());
+		result.removeIf(t->t==null);
+		return result;
+	}
+	
+	public Expression<?> getLeft() {
+		return left;
+	}
+	public Expression<?> getRight() {
+		return right;
+	}
+
 }

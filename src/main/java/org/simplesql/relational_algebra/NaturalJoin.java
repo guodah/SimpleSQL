@@ -45,7 +45,7 @@ public class NaturalJoin extends Join{
 	
 	@Override
 	public String toString(){
-		return String.format(" %s natural join %s", left, right);
+		return String.format(" (%s) natural join (%s)", left, right);
 	}
 
 	@Override

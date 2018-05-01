@@ -163,4 +163,8 @@ public class Project extends Relation{
 		return result;
 	}
 
+	public void addColumns(List<Expression<?>> columns) {
+		this.columns.addAll(columns);
+	}
+
 }

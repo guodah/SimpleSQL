@@ -1,6 +1,8 @@
 package org.simplesql.relational_algebra;
 
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.simplesql.resolve.SchemaResolver;
 
@@ -23,5 +25,15 @@ public abstract class LiteralValue<T extends Comparable<T>> extends Expression<C
 	
 	public boolean resolve(Relation dataSource, OutputStream output){
 		return true;
+	}
+	
+	@Override
+	public boolean isSimple(){
+		return true;
+	}
+	
+	@Override
+	public List<Table> getReferencedTables(){
+		return new ArrayList<>();
 	}
 }
