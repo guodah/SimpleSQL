@@ -53,13 +53,15 @@ public class Main {
 //		execute("schema/test.json", "sELECT a, b, sum(c), count(*) FROM testtableA  natural join testtableB "+
 //				"where a>1 and b>2 GROUP BY a,b;");
 		
-//		execute("schema/test.json", "select testtablea.a, e from (select a, b, c,d from testtablea)"
-//				+ " inner join testtableB on testtableA.b = testtableB.b where c>2");
+		execute("schema/test.json", "select testtablea.a, e from (select * from testtablea)"
+				+ " inner join testtableB on testtableA.b = testtableB.b where c>2");
 
-		execute("schema/test.json", "select testtablea.a, testtableb.b from testtableA inner join "
-				+ "(select a, b, e, f from testtableb) "
-				+ "on testtableA.b = testtableB.b "
-				+"where testtablea.a>2 and testtablea.c>1 and testtableb.f<5 and testtableb.e>=2");
+//		execute("schema/test.json", "select testtablea.a, testtableb.b from testtableA inner join "
+//				+ "(select a, b, e, f from testtableb) "
+//				+ "on testtableA.b = testtableB.b "
+//				+"where testtablea.a>2 and testtablea.c>1 and testtableb.f<5 and testtableb.e>=2");
+		
+//		execute("schema/test.json", "select * from testtablea");
 
 	}
 
@@ -73,23 +75,23 @@ public class Main {
 
 		System.out.println(project);
 		
-		QueryOptimizer optimizer = new QueryOptimizer();
+		QueryOptimizer optimizer = SimpleSQL.prepareOptimizer();
 		optimizer.setRoot(project);
 		optimizer.optimize();
 		
 		System.out.println(project);
 		
-		ProjectIterator projectIterator = IteratorBuilder.buildRelationIterator(project, false);
-		print(projectIterator);				
+//		ProjectIterator projectIterator = IteratorBuilder.buildRelationIterator(project, false);
+//		print(projectIterator);				
 	}
 	private static void print(ProjectIterator projectIterator) {
 		List<Expression<?>> columns = projectIterator.getColumns();
 		StringBuilder sb = new StringBuilder();
-		for(Expression each:columns){
+		for(Expression<?> each:columns){
 			sb.append(each.toString()+"\t");
 		}
 		if(projectIterator.getAggregates()!=null){
-			for(Aggregate aggregate:projectIterator.getAggregates()){
+			for(Aggregate<?> aggregate:projectIterator.getAggregates()){
 				sb.append(aggregate.toString()+"\t");
 			}
 		}
@@ -97,13 +99,20 @@ public class Main {
 		while(projectIterator.hasNext()){
 			sb = new StringBuilder();
 			Row row = projectIterator.next();
-			for(Expression each:columns){
-				sb.append(row.get(each.toString())+"\t");
-			}		
-			if(projectIterator.getAggregates()!=null){
-				for(Aggregate aggregate:projectIterator.getAggregates()){
-					sb.append(row.get(aggregate.toString())+"\t");
-				}
+//			for(Expression<?> each:columns){
+//				sb.append(row.get(each.toString())+"\t");
+//			}
+			
+			
+			
+//			if(projectIterator.getAggregates()!=null){
+//				for(Aggregate<?> aggregate:projectIterator.getAggregates()){
+//					sb.append(row.get(aggregate.toString())+"\t");
+//				}
+//			}
+			
+			for(String each : row.getFieldNames()){
+				sb.append(row.get(each)+"\t");
 			}
 			System.out.println(sb.toString());
 		}

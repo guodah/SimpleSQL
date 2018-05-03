@@ -97,8 +97,32 @@ If performing both predicate push-down and column pruning, the rewritten query b
 	ON TESTTABLEA.B = TESTTABLEB.B)
 
 
+**May 3, 2018**: Added to enable '\*' as the "column" name at the select clause, such as **select \* from testtableA** or in subquery like the following:
+
+	// Table testtablea (a, b, c, d)  
+	// Table testtableb (a, b, e, f)  
+	select testtablea.a, e 
+	from 
+		(select * from testtablea)
+	inner join 
+		testtableB 
+	on testtableA.b = testtableB.b 
+	where c>2 
+	
+The previous query statement will be converted to the following (after pushing down predicates and pruning columns)
+
+	SELECT TESTTABLEA.A, TESTTABLEB.E 
+	FROM 
+		((SELECT TESTTABLEA.B, TESTTABLEA.A, TESTTABLEA.C 
+		FROM (TESTTABLEA) 
+		WHERE TESTTABLEA.C > 2) 
+	INNER JOIN 
+		(SELECT TESTTABLEB.B, TESTTABLEB.E 
+		FROM (TESTTABLEB)) 
+	ON TESTTABLEA.B = TESTTABLEB.B)
+
+
 **PLAN**:
 * implement predicate push down for join conditions
-* support '*' as column name
 * add count distinct
 * add semi join

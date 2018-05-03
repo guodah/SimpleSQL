@@ -37,7 +37,7 @@ public class TestMain {
 	@Before
 	public void setUp() throws MalformedURLException, IOException{
 		SimpleSQL.setSchema(new File(SCHEMA).toURI().toURL());
-		optimizer = SimpleSQL.getOptimizer();
+		optimizer = SimpleSQL.newOptimizer();
 	}
 	
 	@Test
@@ -391,7 +391,6 @@ public class TestMain {
 				+"where testtablea.a>2 and testtablea.c>1 and "
 					+ "testtableb.f<5 and testtableb.e>=2");
 		assertNotNull(optimizedSQL);
-		System.out.println(optimizedSQL);
 		assertEquals(optimizedSQL, 
 				"SELECT TESTTABLEA.A, TESTTABLEB.B "
 				+ "FROM "
@@ -403,6 +402,45 @@ public class TestMain {
 					+ "FROM (TESTTABLEB) "
 					+ "WHERE TESTTABLEB.F < 5 AND TESTTABLEB.E >= 2) "
 				+ "ON TESTTABLEA.B = TESTTABLEB.B)");
+	}
+	
+	@Test
+	public void testStarColumn_1() throws IOException{
+		List<String> result = execute("select * from testtableA");
+		assertNotNull(result);
+		assertEquals(result.size(), 7);
+		assertTrue(result.contains(
+				"{TESTTABLEA.A=1, TESTTABLEA.B=1, TESTTABLEA.C=2, TESTTABLEA.D=4}"));
+		assertTrue(result.contains(
+				"{TESTTABLEA.A=1, TESTTABLEA.B=1, TESTTABLEA.C=4, TESTTABLEA.D=2}"));
+		assertTrue(result.contains(
+				"{TESTTABLEA.A=1, TESTTABLEA.B=2, TESTTABLEA.C=3, TESTTABLEA.D=6}"));
+		assertTrue(result.contains(
+				"{TESTTABLEA.A=1, TESTTABLEA.B=2, TESTTABLEA.C=6, TESTTABLEA.D=3}"));
+		assertTrue(result.contains(
+				"{TESTTABLEA.A=2, TESTTABLEA.B=3, TESTTABLEA.C=4, TESTTABLEA.D=8}"));
+		assertTrue(result.contains(
+				"{TESTTABLEA.A=2, TESTTABLEA.B=3, TESTTABLEA.C=8, TESTTABLEA.D=4}"));
+		assertTrue(result.contains(
+				"{TESTTABLEA.A=2, TESTTABLEA.B=4, TESTTABLEA.C=5, TESTTABLEA.D=10}"));
+	}
+	
+	@Test
+	public void testStarColumn_2() throws IOException{
+		optimizer.addRule(PushDownPredicatesRule.class);
+		optimizer.addRule(ProjectColumnPruneRule.class);
+		String optimizedSQL = optimize("select testtablea.a, e from (select * from testtablea)"
+				+ " inner join testtableB on testtableA.b = testtableB.b where c>2");
+		assertTrue(optimizedSQL.equals(
+				"SELECT TESTTABLEA.A, TESTTABLEB.E "
+				+ "FROM "
+					+ "((SELECT TESTTABLEA.B, TESTTABLEA.A, TESTTABLEA.C "
+					+ "FROM (TESTTABLEA) "
+					+ "WHERE TESTTABLEA.C > 2) "
+				+ "INNER JOIN "
+					+ "(SELECT TESTTABLEB.B, TESTTABLEB.E "
+					+ "FROM (TESTTABLEB)) "
+				+ "ON TESTTABLEA.B = TESTTABLEB.B)"));
 	}
 	
 	private String optimize(String sql) throws IOException{

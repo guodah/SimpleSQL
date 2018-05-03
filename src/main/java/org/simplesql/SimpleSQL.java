@@ -20,6 +20,8 @@ import org.simplesql.parse.SimpleSQLParser;
 import org.simplesql.relational_algebra.Project;
 import org.simplesql.relational_algebra.RANode;
 import org.simplesql.relational_algebra.Relation;
+import org.simplesql.relational_algebra.rules.ProjectColumnPruneRule;
+import org.simplesql.relational_algebra.rules.PushDownPredicatesRule;
 import org.simplesql.resolve.SchemaResolver;
 
 public class SimpleSQL {
@@ -32,8 +34,15 @@ public class SimpleSQL {
 		return resolver;
 	}
 	
-	public static QueryOptimizer getOptimizer(){
+	public static QueryOptimizer newOptimizer(){
 		return new QueryOptimizer();
+	}
+
+	public static QueryOptimizer prepareOptimizer(){
+		QueryOptimizer optimizer = new QueryOptimizer();
+		optimizer.addRule(PushDownPredicatesRule.class);
+		optimizer.addRule(ProjectColumnPruneRule.class);
+		return optimizer;
 	}
 	
 	public static Relation optimize(Relation relation){

@@ -107,28 +107,38 @@ public class Project extends Relation{
 	}
 	
 	public boolean resolve(SchemaResolver resolver, OutputStream output){
-		boolean result = true;
+		boolean resolved = true;
 		// resolve the data source
-		result = result && relation.resolve(resolver, output);
+		resolved = resolved && relation.resolve(resolver, output);
 		
 		// resolve the where clause
 		if(filter!=null){
-			result = result && filter.resolve(relation, resolver, output);
+			resolved = resolved && filter.resolve(relation, resolver, output);
 		}
 		
 		// resolve the project columns
+		boolean starColumn = false;
 		for(Expression<?> column:columns){
-			result = result && column.resolve(relation,  output);
+			resolved = resolved && column.resolve(relation,  output);
+			if(column.getFullName().equals("*")){
+				starColumn = true;				
+			}
+		}
+		
+		// replace the star '*' column with all the real columns
+		if(starColumn){
+			this.columns.addAll(relation.getColumns());
+			this.columns.removeIf(column -> column.getFullName().equals("*"));
 		}
 		
 		// resolve the group by clause
-		result = result && (groupBy==null || groupBy.resolve(relation, resolver, output));
+		resolved = resolved && (groupBy==null || groupBy.resolve(relation, resolver, output));
 		
 		// resolve the aggregate functions
 		for(Aggregate<?> aggregate:aggregates){
-			result = result && aggregate.resolve(relation,  output);
+			resolved = resolved && aggregate.resolve(relation,  output);
 		}
-		return result;
+		return resolved;
 	}
 
 	@Override
