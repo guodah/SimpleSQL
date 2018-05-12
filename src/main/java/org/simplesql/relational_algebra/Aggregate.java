@@ -22,6 +22,11 @@ public abstract class Aggregate<T extends LiteralValue> extends Function<T>
 	abstract public void add(LiteralValue<?> val);
 	abstract public T aggregatedValue();
 
+	@Override
+	public boolean containsLiterals(){
+		return column.containsLiterals();
+	}
+	
 	public boolean resolve(Relation relation, OutputStream output){
 		return column.resolve(relation, output); 
 	}

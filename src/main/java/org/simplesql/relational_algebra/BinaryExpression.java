@@ -22,6 +22,7 @@ abstract public class BinaryExpression<T> extends Expression<T>{
 	public String toString(){
 		return String.format("%s %s %s", left, operator, right);
 	}
+	
 	@Override
 	public boolean resolve(Relation dataSource, OutputStream output) {
 		boolean leftResult = left.resolve(dataSource,  output);
@@ -86,6 +87,8 @@ abstract public class BinaryExpression<T> extends Expression<T>{
 		}
 	}
 	
+	
+	
 	@Override
 	public List<Table> getReferencedTables(){
 		List<Table> result = new ArrayList<>(left.getReferencedTables());
@@ -100,5 +103,13 @@ abstract public class BinaryExpression<T> extends Expression<T>{
 	public Expression<?> getRight() {
 		return right;
 	}
+	
+
+	@Override
+	public boolean containsLiterals() {
+		return left.containsLiterals() ||
+				right.containsLiterals();
+	}
+
 
 }

@@ -36,4 +36,11 @@ public abstract class LiteralValue<T extends Comparable<T>> extends Expression<C
 	public List<Table> getReferencedTables(){
 		return new ArrayList<>();
 	}
+	
+
+	@Override
+	public boolean containsLiterals() {
+		return true;
+	}
+
 }

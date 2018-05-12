@@ -22,6 +22,7 @@ import org.simplesql.relational_algebra.RANode;
 import org.simplesql.relational_algebra.Relation;
 import org.simplesql.relational_algebra.rules.ProjectColumnPruneRule;
 import org.simplesql.relational_algebra.rules.PushDownPredicatesRule;
+import org.simplesql.relational_algebra.rules.TransitiveConditionRule;
 import org.simplesql.resolve.SchemaResolver;
 
 public class SimpleSQL {
@@ -40,6 +41,7 @@ public class SimpleSQL {
 
 	public static QueryOptimizer prepareOptimizer(){
 		QueryOptimizer optimizer = new QueryOptimizer();
+		optimizer.addRule(TransitiveConditionRule.class);
 		optimizer.addRule(PushDownPredicatesRule.class);
 		optimizer.addRule(ProjectColumnPruneRule.class);
 		return optimizer;

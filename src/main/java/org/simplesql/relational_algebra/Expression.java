@@ -22,6 +22,12 @@ public abstract class Expression <T> implements RANode{
 		return resolved;
 	}
 	
+	@Override
+	public boolean equals(Object o){
+		return o instanceof Expression<?> &&
+				((Expression<?>)o).getFullName().equals(getFullName());
+	}
+	
 	abstract public String getSimpleName();
 	abstract public String getFullName();
 	
@@ -101,6 +107,7 @@ public abstract class Expression <T> implements RANode{
 		}
 	}
 	
+	abstract public boolean containsLiterals();
 
 	abstract public boolean isNumeric();
 

@@ -29,6 +29,7 @@ import org.simplesql.relational_algebra.LiteralValue;
 import org.simplesql.relational_algebra.Project;
 import org.simplesql.relational_algebra.rules.ProjectColumnPruneRule;
 import org.simplesql.relational_algebra.rules.PushDownPredicatesRule;
+import org.simplesql.relational_algebra.rules.TransitiveConditionRule;
 import org.simplesql.resolve.SchemaResolver;
 
 public class TestMain {
@@ -441,6 +442,81 @@ public class TestMain {
 					+ "(SELECT TESTTABLEB.B, TESTTABLEB.E "
 					+ "FROM (TESTTABLEB)) "
 				+ "ON TESTTABLEA.B = TESTTABLEB.B)"));
+	}
+	
+	@Test
+	public void testTransitiveConditionWithNaturalJoin() throws IOException{
+		optimizer.addRule(TransitiveConditionRule.class);
+		optimizer.addRule(PushDownPredicatesRule.class);
+		optimizer.addRule(ProjectColumnPruneRule.class);
+		
+		String optimizedSQL = optimize("select a,b, e, f "
+				+ "from testtableA natural join testtableB "
+				+ "where testtableA.a>2");
+		assertTrue(optimizedSQL.equals(
+				"SELECT TESTTABLEA.A, TESTTABLEA.B, TESTTABLEB.E, TESTTABLEB.F "
+				+ "FROM ( "
+					+ "(SELECT TESTTABLEA.B, TESTTABLEA.A "
+					+ "FROM (TESTTABLEA) "
+					+ "WHERE TESTTABLEA.A > 2) "
+				+ "NATURAL JOIN "
+					+ "(SELECT TESTTABLEB.A, TESTTABLEB.B, TESTTABLEB.E, TESTTABLEB.F "
+					+ "FROM (TESTTABLEB) "
+					+ "WHERE TESTTABLEB.A > 2))"));
+	}
+
+	@Test
+	public void testTransitiveConditionWithInnerJoin() throws IOException{
+		optimizer.addRule(TransitiveConditionRule.class);
+		optimizer.addRule(PushDownPredicatesRule.class);
+		optimizer.addRule(ProjectColumnPruneRule.class);
+		
+		String optimizedSQL = optimize(
+				"select testtableA.a, testtableB.b, testtableB.e "
+				+ "from "
+					+ "testtableA "
+				+ "inner join "
+					+ "testtableB "
+				+ "on testtableA.a=testtableB.a "
+				+ "where testtableA.a>2");
+		assertTrue(optimizedSQL.equals(
+				"SELECT TESTTABLEA.A, TESTTABLEB.B, TESTTABLEB.E "
+				+ "FROM ("
+					+ "(SELECT TESTTABLEA.A "
+					+ "FROM (TESTTABLEA) "
+					+ "WHERE TESTTABLEA.A > 2) "
+				+ "INNER JOIN "
+					+ "(SELECT TESTTABLEB.A, TESTTABLEB.B, TESTTABLEB.E "
+					+ "FROM (TESTTABLEB) "
+					+ "WHERE TESTTABLEB.A > 2) "
+				+ "ON TESTTABLEA.A = TESTTABLEB.A)"));
+	}
+
+	@Test
+	public void testTransitiveConditionWithSubquery() throws IOException{
+		optimizer.addRule(TransitiveConditionRule.class);
+		optimizer.addRule(PushDownPredicatesRule.class);
+		optimizer.addRule(ProjectColumnPruneRule.class);
+		
+		String optimizedSQL = optimize(
+				"select testtableA.a, testtableB.b, testtableB.e "
+				+ "from "
+					+ "testtableA "
+				+ "inner join "
+					+ "(select * from testtableB) "
+				+ "on testtableA.a=testtableB.a "
+				+ "where testtableA.a>2");
+		assertTrue(optimizedSQL.equals(
+				"SELECT TESTTABLEA.A, TESTTABLEB.B, TESTTABLEB.E "
+				+ "FROM ("
+					+ "(SELECT TESTTABLEA.A "
+					+ "FROM (TESTTABLEA) "
+					+ "WHERE TESTTABLEA.A > 2) "
+				+ "INNER JOIN "
+					+ "(SELECT TESTTABLEB.A, TESTTABLEB.B, TESTTABLEB.E "
+					+ "FROM (TESTTABLEB) "
+					+ "WHERE TESTTABLEB.A > 2) "
+				+ "ON TESTTABLEA.A = TESTTABLEB.A)"));
 	}
 	
 	private String optimize(String sql) throws IOException{

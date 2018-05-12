@@ -3,6 +3,7 @@ package org.simplesql.relational_algebra;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.simplesql.iterators.Row;
@@ -22,6 +23,14 @@ public class ConditionedJoin extends Join{
 		}
 	}
 
+	public Map<Expression<?>, Set<Expression<?>>> findAlias(){
+		return joinCondition.findAlias();
+	}
+	
+	public boolean isEquiJoin(){
+		return joinCondition.isEqui();
+	}
+	
 	public boolean isInnerJoin(){
 		return inner;
 	}

@@ -16,8 +16,6 @@ public class QueryOptimizer {
 	private Relation root;
 	public QueryOptimizer(){
 		rules = new ArrayList<>();
-//		rules.add(PushDownPredicatesRule.class);
-//		rules.add(ProjectColumnPruneRule.class);
 		root = null;
 	}
 	

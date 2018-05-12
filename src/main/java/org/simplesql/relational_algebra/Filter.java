@@ -21,6 +21,10 @@ public class Filter implements RANode{
 		
 	}
 	
+	public void findTransitiveCondition(Map<Expression<?>, Set<Expression<?>>> alias){
+		expression.findTransitiveCondition(alias);
+	}
+	
 	public void setExpression(BooleanBinaryExpression expression){
 		this.expression = expression;
 	}
@@ -98,4 +102,6 @@ public class Filter implements RANode{
 		}
 		expression = new BooleanBinaryExpression(expression, "AND", filter.getExpression());
 	}
+	
+	
 }

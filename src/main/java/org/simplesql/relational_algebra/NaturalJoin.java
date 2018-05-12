@@ -7,10 +7,32 @@ import java.util.Set;
 
 import org.simplesql.resolve.SchemaResolver;
 
-public class NaturalJoin extends Join{
+public class NaturalJoin extends ConditionedJoin{
 
 	public NaturalJoin(Relation left, Relation right) {
-		super(left, right);
+		super(left, right, true, findCondition(left, right));
+	}
+
+	private static BooleanBinaryExpression findCondition(
+			Relation left, Relation right) {
+		List<? extends Expression<?>> leftColumns = left.getColumns();
+		List<? extends Expression<?>> rightColumns = right.getColumns();
+		
+		BooleanBinaryExpression result = null;
+		for(Expression<?> lc:leftColumns){
+			for(Expression<?> rc:rightColumns){
+				if(lc.getSimpleName().equals(rc.getSimpleName())){
+					if(result==null){
+						result = new BooleanBinaryExpression(lc, "=", rc);
+					}else{
+						result = new BooleanBinaryExpression(result, "AND", 
+								new BooleanBinaryExpression(lc, "=", rc));
+					}
+					break;
+				}
+			}
+		}
+		return result;
 	}
 
 	public List<Expression<?>> findCommonColumns(){
@@ -45,7 +67,7 @@ public class NaturalJoin extends Join{
 	
 	@Override
 	public String toString(){
-		return String.format(" (%s) natural join (%s)", left, right);
+		return String.format(" (%s) NATURAL JOIN (%s)", left, right);
 	}
 
 	@Override

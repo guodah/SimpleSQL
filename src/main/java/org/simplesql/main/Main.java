@@ -53,8 +53,8 @@ public class Main {
 //		execute("schema/test.json", "sELECT a, b, sum(c), count(*) FROM testtableA  natural join testtableB "+
 //				"where a>1 and b>2 GROUP BY a,b;");
 		
-		execute("schema/test.json", "select testtablea.a, e from (select * from testtablea)"
-				+ " inner join testtableB on testtableA.b = testtableB.b where c>2");
+//		execute("schema/test.json", "select testtablea.a, e from (select * from testtablea)"
+//				+ " inner join testtableB on testtableA.b = testtableB.b where c>2");
 
 //		execute("schema/test.json", "select testtablea.a, testtableb.b from testtableA inner join "
 //				+ "(select a, b, e, f from testtableb) "
@@ -63,6 +63,25 @@ public class Main {
 		
 //		execute("schema/test.json", "select * from testtablea");
 
+		execute("schema/test.json", "select a,b, e, f from testtableA natural join testtableB where testtableA.a>2");
+
+		execute("schema/test.json", 
+				"select testtableA.a, testtableB.b, testtableB.e "
+				+ "from "
+					+ "testtableA "
+					+ "inner join "
+					+ "testtableB "
+					+ "on testtableA.a=testtableB.a "
+				+ "where testtableA.a>2");
+
+		execute("schema/test.json", 
+				"select testtableA.a, testtableB.b, testtableB.e "
+				+ "from "
+					+ "testtableA "
+					+ "inner join "
+					+ "(select * from testtableB) "
+					+ "on testtableA.a=testtableB.a "
+				+ "where testtableA.a>2");
 	}
 
 	private static void execute(String schemaPath, String sql) throws IOException {

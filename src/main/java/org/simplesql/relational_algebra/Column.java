@@ -143,4 +143,11 @@ public class Column extends Expression<LiteralValue>{
 	public List<Table> getReferencedTables() {
 		return Arrays.asList(new Table(tableName));
 	}	
+	
+
+	@Override
+	public boolean containsLiterals() {
+		return false;
+	}
+
 }

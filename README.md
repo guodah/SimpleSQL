@@ -97,7 +97,7 @@ If performing both predicate push-down and column pruning, the rewritten query b
 	ON TESTTABLEA.B = TESTTABLEB.B)
 
 
-**May 3, 2018**: Added to enable '\*' as the "column" name at the select clause, such as **select \* from testtableA** or in subquery like the following:
+**May 3, 2018**: Added code to enable '\*' as the "column" name at the select clause, such as **select \* from testtableA** or in subquery like the following:
 
 	// Table testtablea (a, b, c, d)  
 	// Table testtableb (a, b, e, f)  
@@ -122,7 +122,54 @@ The previous query statement will be converted to the following (after pushing d
 	ON TESTTABLEA.B = TESTTABLEB.B)
 
 
+**May 12, 2018**: added code for using transitive condition to narrow down the considered rows in joined relations. For example, the following SQL statement:
+
+	// testtableA (a,b,c,d)
+	// testtableB (a,b,e,f)
+	select a,b, e, f 
+	from testtableA natural join testtableB 
+	where testtableA.a>2 
+
+Because the natural join is to match the rows in testtableA and testtableB using columns a and b, the where condition **testtableA.a>2** also implies **testtableB.a>2**. Therefore, the previous SQL statement can be optimized to the following where the "where" condition is pushed down to the joined tables:
+
+				SELECT TESTTABLEA.A, TESTTABLEA.B, TESTTABLEB.E, TESTTABLEB.F 
+				FROM ( 
+					SELECT TESTTABLEA.B, TESTTABLEA.A 
+					FROM (TESTTABLEA) 
+					WHERE TESTTABLEA.A > 2) 
+				NATURAL JOIN 
+					(SELECT TESTTABLEB.A, TESTTABLEB.B, TESTTABLEB.E, TESTTABLEB.F 
+					FROM (TESTTABLEB) 
+					WHERE TESTTABLEB.A > 2))
+
+The next example considers inner join and subquery:
+
+	// testtableA (a,b,c,d)
+	// testtableB (a,b,e,f)
+	select testtableA.a, testtableB.b, testtableB.e 
+	from 
+		testtableA 
+	inner join 
+		(select * from testtableB) 
+	on testtableA.a=testtableB.a 
+	where testtableA.a>2
+
+This statement can be optimized to the following:
+
+	SELECT TESTTABLEA.A, TESTTABLEB.B, TESTTABLEB.E 
+	FROM (
+		(SELECT TESTTABLEA.A 
+		FROM (TESTTABLEA) 
+		WHERE TESTTABLEA.A > 2) 
+	INNER JOIN 
+		(SELECT TESTTABLEB.A, TESTTABLEB.B, TESTTABLEB.E 
+		FROM (TESTTABLEB) 
+		WHERE TESTTABLEB.A > 2) 
+	ON TESTTABLEA.A = TESTTABLEB.A)
+
+
 **PLAN**:
+* add code for join simplication
 * implement predicate push down for join conditions
 * add count distinct
 * add semi join
