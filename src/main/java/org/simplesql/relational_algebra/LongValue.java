@@ -43,7 +43,7 @@ public class LongValue extends NumericValue<Long>{
 			return false;
 	}
 	@Override
-	public Set<Column> getReferencedColumns() {
+	public Set<Expression<?>> getReferencedColumns() {
 		return null;
 	}	
 

@@ -32,7 +32,7 @@ public abstract class Aggregate<T extends LiteralValue> extends Function<T>
 	}
 	
 	@Override
-	public Set<Column> getReferencedColumns(){
+	public Set<Expression<?>> getReferencedColumns(){
 		return column.getReferencedColumns();		
 	}
 	
@@ -45,4 +45,10 @@ public abstract class Aggregate<T extends LiteralValue> extends Function<T>
 	public List<Table> getReferencedTables(){
 		return column.getReferencedTables();
 	}
+	
+	@Override
+	public void replaceWith(Column c1, Column c2) {
+		this.column.replaceWith(c1, c2);
+	}
+
 }

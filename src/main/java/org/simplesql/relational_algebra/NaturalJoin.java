@@ -91,14 +91,14 @@ public class NaturalJoin extends ConditionedJoin{
 	}
 
 	@Override
-	public Set<Column> getReferencedColumns() {
+	public Set<Expression<?>> getReferencedColumns() {
 		List<Expression<?>> commonColumns = findCommonColumns();
 		Set<String> commonSimpleNames = new HashSet<>();
 		for(Expression<?> each:commonColumns){
 			commonSimpleNames.add(each.getSimpleName());
 		}
 
-		Set<Column> result = new HashSet<>();
+		Set<Expression<?>> result = new HashSet<>();
 		for(Expression<?> each:left.getColumns()){
 			if(each instanceof Column && 
 					commonSimpleNames.contains(each.getSimpleName())){

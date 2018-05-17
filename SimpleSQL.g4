@@ -105,7 +105,7 @@ OR: O R ;
 NULL: N U L L;
 GROUP: G R O U P;
 BY: B Y;
-ANY_NAME : [a-zA-Z]+ ; 
+ANY_NAME : [_a-zA-Z]+ ; 
 
 fragment DIGIT : [0-9];
 

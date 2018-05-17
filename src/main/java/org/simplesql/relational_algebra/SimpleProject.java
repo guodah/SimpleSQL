@@ -52,7 +52,7 @@ public class SimpleProject extends Relation{
 		return new ArrayList<>(getReferencedColumns());
 	}
 	@Override
-	public Set<Column> getReferencedColumns() {
+	public Set<Expression<?>> getReferencedColumns() {
 		return new HashSet<>(columns);
 	}
 
@@ -77,5 +77,10 @@ public class SimpleProject extends Relation{
 	}
 	public Table getTable() {
 		return table;
+	}
+	
+	@Override
+	public void replaceWith(Column c1, Column c2) {
+		return;
 	}
 }

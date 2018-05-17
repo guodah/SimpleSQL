@@ -79,7 +79,12 @@ public class ConditionedJoin extends Join{
 	}
 	
 	@Override
-	public Set<Column> getReferencedColumns(){
+	public Set<Expression<?>> getReferencedColumns(){
 		return joinCondition.getReferencedColumns();
+	}
+	
+	@Override
+	public void replaceWith(Column c1, Column c2) {
+		joinCondition.replaceWith(c1, c2);
 	}
 }

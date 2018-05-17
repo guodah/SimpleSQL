@@ -66,5 +66,4 @@ public class AggregateCount extends Aggregate<LongValue> {
 		return false;
 	}
 
-
 }

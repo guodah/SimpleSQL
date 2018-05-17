@@ -15,17 +15,21 @@ public class Project extends Relation{
 	private Relation relation;
 	private List<Aggregate<?>> aggregates;
 	private GroupBy groupBy;
-	private boolean topProject;
+	private boolean isSubquery;
 	
 	public Project(){
 		this(false);
 	}
 	
-	public Project(boolean topProject){
+	public Project(boolean isSubquery){
 		aggregates = new ArrayList<>();
 		columns = new ArrayList<>();
 		groupBy = null;
-		this.topProject = topProject;
+		this.isSubquery = isSubquery;
+	}
+	
+	public boolean isSubquery(){
+		return isSubquery;
 	}
 	
 	public void addGroupBy(GroupBy groupBy){
@@ -145,6 +149,19 @@ public class Project extends Relation{
 	public List<Expression<?>> getColumns() {
 		return this.columns;
 	}
+	
+	// given a+b, return a, b, a+b
+	public Set<Expression<?>> getAllColumns(){
+		Set<Expression<?>> result = new HashSet<>();
+		for(Expression<?> column:columns){
+			Set<Expression<?>> expr = column.getReferencedColumns();
+			if(expr!=null){
+				result.addAll(expr);
+			}
+			result.add(column);
+		}
+		return result;
+	}
 
 	@Override
 	public Table locateColumnBySimpleName(String column) {
@@ -152,8 +169,12 @@ public class Project extends Relation{
 	}
 
 	@Override
-	public Set<Column> getReferencedColumns() {
-		Set<Column> result = new HashSet<>();
+	public Set<Expression<?>> getReferencedColumns() {
+		return getReferencedColumns(true);
+	}
+	
+	public Set<Expression<?>> getReferencedColumns(boolean projectionIncluded) {
+		Set<Expression<?>> result = new HashSet<>();
 		if(filter!=null){
 			result.addAll(filter.getReferencedColumns());
 		}
@@ -162,19 +183,33 @@ public class Project extends Relation{
 			result.addAll(groupBy.getReferencedColumns());
 		}
 
-		if(topProject){
-			for(Expression<?> column:columns){
-				Set<Column> expr = column.getReferencedColumns();
-				if(expr!=null){
-					result.addAll(expr);
-				}
-			}
+		if(projectionIncluded){
+			result.addAll(getAllColumns());
 		}
 		return result;
 	}
+	
 
 	public void addColumns(List<Expression<?>> columns) {
 		this.columns.addAll(columns);
+	}
+
+	@Override
+	public void replaceWith(Column c1, Column c2) {
+		for(Expression<?> each: getColumns()){
+			each.replaceWith(c1, c2);
+		}
+		
+		if(filter!=null){
+			filter.replaceWith(c1, c2);
+		}
+		
+		if(groupBy!=null){
+			groupBy.replaceWith(c1, c2);
+			for(Aggregate each:aggregates){
+				each.replaceWith(c1, c2);
+			}
+		}
 	}
 
 }

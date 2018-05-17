@@ -62,7 +62,7 @@ public class Main {
 //				+"where testtablea.a>2 and testtablea.c>1 and testtableb.f<5 and testtableb.e>=2");
 		
 //		execute("schema/test.json", "select * from testtablea");
-
+/*
 		execute("schema/test.json", "select a,b, e, f from testtableA natural join testtableB where testtableA.a>2");
 
 		execute("schema/test.json", 
@@ -82,6 +82,22 @@ public class Main {
 					+ "(select * from testtableB) "
 					+ "on testtableA.a=testtableB.a "
 				+ "where testtableA.a>2");
+*/
+		/*
+		execute("schema/test.json",
+				"select KeyTableA.a, testtableA.b "
+				+ "from testtableA inner join KeyTableA "
+					+ "on testtableA.a=KeyTableA.a "
+				+ "where KeyTableA.a>1");
+		*/
+		execute("schema/test.json",
+				"select KeyTableA.a, testtableA.b "
+				+ "from testtableA inner join KeyTableA "
+					+ "on testtableA.a=KeyTableA.a "
+					+ "inner join KeyTableB "
+					+ "on testtableA.b=KeyTableB.b "
+				+ "where KeyTableA.a>1 or KeyTableB.b<4");
+
 	}
 
 	private static void execute(String schemaPath, String sql) throws IOException {

@@ -51,9 +51,9 @@ abstract public class BinaryExpression<T> extends Expression<T>{
 	}
 
 	@Override
-	public Set<Column> getReferencedColumns(){
-		Set<Column> leftColumns = left.getReferencedColumns();
-		Set<Column> rightColumns = right.getReferencedColumns();
+	public Set<Expression<?>> getReferencedColumns(){
+		Set<Expression<?>> leftColumns = left.getReferencedColumns();
+		Set<Expression<?>> rightColumns = right.getReferencedColumns();
 		
 		if(leftColumns==null){
 			return rightColumns;
@@ -61,7 +61,7 @@ abstract public class BinaryExpression<T> extends Expression<T>{
 			return leftColumns;
 		}
 		
-		Set<Column> result = new HashSet<>(leftColumns);
+		Set<Expression<?>> result = new HashSet<>(leftColumns);
 		result.addAll(rightColumns);
 		return result;
 	}
@@ -111,5 +111,9 @@ abstract public class BinaryExpression<T> extends Expression<T>{
 				right.containsLiterals();
 	}
 
-
+	@Override
+	public void replaceWith(Column c1, Column c2) {
+		left.replaceWith(c1, c2);
+		right.replaceWith(c1, c2);
+	}
 }

@@ -42,5 +42,8 @@ public abstract class LiteralValue<T extends Comparable<T>> extends Expression<C
 	public boolean containsLiterals() {
 		return true;
 	}
+	@Override
+	public void replaceWith(Column c1, Column c2) {
+	}	
 
 }

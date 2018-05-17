@@ -12,6 +12,8 @@ public class GroupBy implements RANode{
 	private List<Column> columns;
 	private List<Aggregate<?>> aggregates;
 	
+	
+	
 	public GroupBy(){
 		columns = new ArrayList<>();
 	}
@@ -65,7 +67,17 @@ public class GroupBy implements RANode{
 	}
 	
 	@Override
-	public Set<Column> getReferencedColumns(){
+	public Set<Expression<?>> getReferencedColumns(){
 		return new HashSet<>(columns);
+	}
+	@Override
+	public void replaceWith(Column c1, Column c2) {
+		for(Expression<?> expression:aggregates){
+			expression.replaceWith(c1, c2);
+		}
+		
+		for(Column each:columns){
+			each.replaceWith(c1, c2);
+		}
 	}
 }

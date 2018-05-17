@@ -40,8 +40,9 @@ public class DoubleValue extends NumericValue<Double>{
 			return false;
 	}
 	@Override
-	public Set<Column> getReferencedColumns() {
+	public Set<Expression<?>> getReferencedColumns() {
 		return null;
-	}	
+	}
+
 
 }

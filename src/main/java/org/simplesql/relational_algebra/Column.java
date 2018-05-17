@@ -128,8 +128,8 @@ public class Column extends Expression<LiteralValue>{
 	}
 
 	@Override
-	public Set<Column> getReferencedColumns() {
-		Set<Column> result = new HashSet<>();
+	public Set<Expression<?>> getReferencedColumns() {
+		Set<Expression<?>> result = new HashSet<>();
 		result.add(this);
 		return result;
 	}
@@ -148,6 +148,14 @@ public class Column extends Expression<LiteralValue>{
 	@Override
 	public boolean containsLiterals() {
 		return false;
+	}
+
+	@Override
+	public void replaceWith(Column c1, Column c2) {
+		if(equals(c1)){
+			this.tableName = c2.tableName;
+			this.columnName = c2.columnName;
+		}
 	}
 
 }

@@ -62,7 +62,7 @@ public class NullValue extends LiteralValue<Null>{
 		return "NULL";
 	}
 	@Override
-	public Set<Column> getReferencedColumns() {
+	public Set<Expression<?>> getReferencedColumns() {
 		return null;
 	}	
 

@@ -40,7 +40,7 @@ public class Table extends Relation{
 		return null;
 	}
 	@Override
-	public Set<Column> getReferencedColumns() {
+	public Set<Expression<?>> getReferencedColumns() {
 		if(!SimpleSQL.getSchemaResolver().validateTable(tableName)){
 			throw new IllegalStateException("Table "+tableName+" not found.");
 		}
@@ -50,5 +50,10 @@ public class Table extends Relation{
 	@Override
 	public boolean equals(Object obj){
 		return obj instanceof Table && tableName.equals(((Table)obj).tableName);
+	}
+	
+	@Override
+	public void replaceWith(Column c1, Column c2) {
+		return;
 	}
 }

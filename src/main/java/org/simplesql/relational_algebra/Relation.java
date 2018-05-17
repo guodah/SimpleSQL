@@ -36,4 +36,5 @@ public abstract class Relation implements RANode{
 
 
 	abstract public List<Expression<?>> getColumns();
+	
 }

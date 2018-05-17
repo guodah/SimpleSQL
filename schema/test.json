@@ -23,6 +23,23 @@
 			"type": "integer",
 			"default": null
 		}
+	],
+	"foreign_keys":[
+		{
+			"column": "a",
+			"references":{
+				"table": "KeyTableA",
+				"column": "a"
+			}
+		},
+		{
+			"column": "b",
+			"references":{
+				"table": "KeyTableB",
+				"column": "b"
+			}
+		}
+		
 	]
 },
 {
@@ -76,6 +93,39 @@
 			"default": null
 		}
 	]
+},
+{
+	"table": "KeyTableA",
+	"path": "data/KeyTableB.csv",
+	"columns":[
+		{
+			"field": "a",
+			"type": "integer",
+			"default": null
+		}
+	],
+	"primary_key": [
+		{
+			"column": "a"
+		}
+	]
+},
+{
+	"table": "KeyTableB",
+	"path": "data/KeyTableB.csv",
+	"columns":[
+		{
+			"field": "b",
+			"type": "integer",
+			"default": null
+		}
+	],
+	"primary_key": [
+		{
+			"column": "b"
+		}
+	]
 }
+
 
 ]

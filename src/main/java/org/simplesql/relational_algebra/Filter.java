@@ -47,7 +47,7 @@ public class Filter implements RANode{
 	}
 
 	@Override
-	public Set<Column> getReferencedColumns() {
+	public Set<Expression<?>> getReferencedColumns() {
 		return expression.getReferencedColumns();
 	}
 	
@@ -101,6 +101,11 @@ public class Filter implements RANode{
 			return;
 		}
 		expression = new BooleanBinaryExpression(expression, "AND", filter.getExpression());
+	}
+
+	@Override
+	public void replaceWith(Column c1, Column c2) {
+		expression.replaceWith(c1, c2);
 	}
 	
 	

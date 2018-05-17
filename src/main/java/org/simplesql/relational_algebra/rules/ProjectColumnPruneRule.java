@@ -34,7 +34,7 @@ public class ProjectColumnPruneRule extends RARule{
 		
 		// collect all the referenced columns in project, 
 		// filter, aggregate, relation, and group by
-		Set<Column> referencedColumns = new HashSet<>(
+		Set<Expression<?>> referencedColumns = new HashSet<>(
 				request.getRANode().getReferencedColumns());
 		
 		/*
@@ -50,7 +50,7 @@ public class ProjectColumnPruneRule extends RARule{
 		((Project)request.getRANode()).setRelation(relation);
 	}
 
-	private Relation prune(Relation relation, Set<Column> referencedColumns) {
+	private Relation prune(Relation relation, Set<Expression<?>> referencedColumns) {
 		if(relation instanceof Table){
 			return pruneTable((Table)relation,referencedColumns);
 		}else if(relation instanceof Join){
@@ -62,26 +62,31 @@ public class ProjectColumnPruneRule extends RARule{
 		}
 	}
 
-	private Relation pruneJoin(Join relation, Set<Column> referencedColumns) {
+	private Relation pruneJoin(Join relation, Set<Expression<?>> referencedColumns) {
+		Set<Expression<?>> save = new HashSet<>(referencedColumns);
 		referencedColumns.addAll(relation.getReferencedColumns());
 		relation.setLeft(prune(relation.getLeft(),referencedColumns));
 		relation.setRight(prune(relation.getRight(),referencedColumns));
-		referencedColumns.removeAll(relation.getReferencedColumns());
+//		referencedColumns.removeAll(relation.getReferencedColumns());
+		referencedColumns.clear();
+		referencedColumns.addAll(save);
 		return relation;
 	}
 
-	private Relation pruneProject(Project relation, Set<Column> referencedColumns) {
-		referencedColumns.addAll(relation.getReferencedColumns());
+	private Relation pruneProject(Project relation, Set<Expression<?>> referencedColumns) {
+		Set<Expression<?>> save = new HashSet<>(referencedColumns);
+		referencedColumns.addAll(relation.getReferencedColumns(false));
 		for(Expression<?> column:new ArrayList<>(relation.getColumns())){
 			if(column instanceof Column && !referencedColumns.contains(column)){
 				relation.removeColumn(column);
 			}
 		}
-		referencedColumns.removeAll(relation.getReferencedColumns());
+		referencedColumns.clear();
+		referencedColumns.addAll(save);
 		return relation;
 	}
 
-	private Relation pruneTable(Table relation, Set<Column> referencedColumns) {
+	private Relation pruneTable(Table relation, Set<Expression<?>> referencedColumns) {
 		
 		Set<Expression<?>> referenced = new HashSet<>();
 		for(Expression<?> column:relation.getColumns()){

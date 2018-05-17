@@ -27,6 +27,7 @@ import org.simplesql.parse.SimpleSQLLexer;
 import org.simplesql.parse.SimpleSQLParser;
 import org.simplesql.relational_algebra.LiteralValue;
 import org.simplesql.relational_algebra.Project;
+import org.simplesql.relational_algebra.rules.JoinSimplicationRule;
 import org.simplesql.relational_algebra.rules.ProjectColumnPruneRule;
 import org.simplesql.relational_algebra.rules.PushDownPredicatesRule;
 import org.simplesql.relational_algebra.rules.TransitiveConditionRule;
@@ -517,6 +518,22 @@ public class TestMain {
 					+ "FROM (TESTTABLEB) "
 					+ "WHERE TESTTABLEB.A > 2) "
 				+ "ON TESTTABLEA.A = TESTTABLEB.A)"));
+	}
+	
+	@Test
+	public void testJoinSimplication() throws IOException{
+		optimizer.addRule(JoinSimplicationRule.class);
+		String optimizedSQL = optimize(
+				"select KeyTableA.a, KeyTableB.b "
+				+ "from testtableA inner join KeyTableA "
+					+ "on testtableA.a=KeyTableA.a "
+					+ "inner join KeyTableB "
+					+ "on testtableA.b=KeyTableB.b "
+				+ "where KeyTableA.a>1 or KeyTableB.b<4");
+		assertTrue(optimizedSQL.equals(
+				"SELECT TESTTABLEA.A, TESTTABLEA.B "
+				+ "FROM (TESTTABLEA) "
+				+ "WHERE TESTTABLEA.A > 1 OR TESTTABLEA.B < 4"));
 	}
 	
 	private String optimize(String sql) throws IOException{
