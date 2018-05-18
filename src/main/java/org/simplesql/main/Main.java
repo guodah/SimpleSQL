@@ -89,7 +89,7 @@ public class Main {
 				+ "from testtableA inner join KeyTableA "
 					+ "on testtableA.a=KeyTableA.a "
 				+ "where KeyTableA.a>1");
-		*/
+		
 		execute("schema/test.json",
 				"select KeyTableA.a, testtableA.b "
 				+ "from testtableA inner join KeyTableA "
@@ -97,11 +97,15 @@ public class Main {
 					+ "inner join KeyTableB "
 					+ "on testtableA.b=KeyTableB.b "
 				+ "where KeyTableA.a>1 or KeyTableB.b<4");
-
+*/		
+		execute("schema/test.json",
+				"select a from (select a, b, a+b from testtableA)");
 	}
 
 	private static void execute(String schemaPath, String sql) throws IOException {
-		CharStream input = CharStreams.fromStream(new ByteArrayInputStream(sql.toUpperCase().getBytes()));
+		CharStream input = 
+		//		CharStreams.fromFileName("test.sql");
+				CharStreams.fromStream(new ByteArrayInputStream(sql.toUpperCase().getBytes()));
 		SimpleSQLLexer lexer = new SimpleSQLLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		SimpleSQLParser parser = new SimpleSQLParser(tokens);

@@ -43,9 +43,9 @@ public class SimpleSQL {
 	public static QueryOptimizer prepareOptimizer(){
 		QueryOptimizer optimizer = new QueryOptimizer();
 		optimizer.addRule(JoinSimplicationRule.class);
-//		optimizer.addRule(TransitiveConditionRule.class);
-//		optimizer.addRule(PushDownPredicatesRule.class);
-//		optimizer.addRule(ProjectColumnPruneRule.class);
+		optimizer.addRule(TransitiveConditionRule.class);
+		optimizer.addRule(PushDownPredicatesRule.class);
+		optimizer.addRule(ProjectColumnPruneRule.class);
 		return optimizer;
 	}
 	

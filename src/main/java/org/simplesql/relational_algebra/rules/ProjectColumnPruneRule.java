@@ -77,7 +77,7 @@ public class ProjectColumnPruneRule extends RARule{
 		Set<Expression<?>> save = new HashSet<>(referencedColumns);
 		referencedColumns.addAll(relation.getReferencedColumns(false));
 		for(Expression<?> column:new ArrayList<>(relation.getColumns())){
-			if(column instanceof Column && !referencedColumns.contains(column)){
+			if(!referencedColumns.contains(column)){
 				relation.removeColumn(column);
 			}
 		}

@@ -287,6 +287,15 @@ public class TestMain {
 	}
 	
 	@Test
+	public void testColumnPruneWithExpression() throws IOException{
+		optimizer.addRule(ProjectColumnPruneRule.class);
+		String optimizedSQL = optimize("select a from (select a, b, a+b from testtableA)");
+		assertNotNull(optimizedSQL);
+		assertEquals(optimizedSQL, 
+				"SELECT TESTTABLEA.A FROM (SELECT TESTTABLEA.A FROM (TESTTABLEA))");
+	}
+	
+	@Test
 	public void testColumnPruneWithSubquery() throws IOException{
 		optimizer.addRule(ProjectColumnPruneRule.class);
 		String optimizedSQL = optimize(
