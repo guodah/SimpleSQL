@@ -1,7 +1,7 @@
 [
 {
-	"table": "TestTableA",
-	"path": "data/testtableA.csv",
+	"table": "Table_A",
+	"path": "data/Table_A.csv",
 	"columns":[
 		{
 			"field": "a",
@@ -28,14 +28,14 @@
 		{
 			"column": "a",
 			"references":{
-				"table": "KeyTableA",
+				"table": "KeyTable_A",
 				"column": "a"
 			}
 		},
 		{
 			"column": "b",
 			"references":{
-				"table": "KeyTableB",
+				"table": "KeyTable_B",
 				"column": "b"
 			}
 		}
@@ -43,8 +43,8 @@
 	]
 },
 {
-	"table": "TestTableB",
-	"path": "data/testtableB.csv",
+	"table": "Table_B",
+	"path": "data/Table_B.csv",
 	"columns":[
 		{
 			"field": "a",
@@ -69,8 +69,8 @@
 	]
 },
 {
-	"table": "TestTableC",
-	"path": "data/testtableC.csv",
+	"table": "Table_C",
+	"path": "data/Table_C.csv",
 	"columns":[
 		{
 			"field": "a",
@@ -95,8 +95,8 @@
 	]
 },
 {
-	"table": "KeyTableA",
-	"path": "data/KeyTableB.csv",
+	"table": "KeyTable_A",
+	"path": "data/KeyTable_A.csv",
 	"columns":[
 		{
 			"field": "a",
@@ -111,8 +111,8 @@
 	]
 },
 {
-	"table": "KeyTableB",
-	"path": "data/KeyTableB.csv",
+	"table": "KeyTable_B",
+	"path": "data/KeyTable_B.csv",
 	"columns":[
 		{
 			"field": "b",
