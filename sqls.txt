@@ -1,0 +1,33 @@
+select * from table_A
+$
+SELECT a, b, c, d 
+from table_A 
+where a>=2 and c>=5;
+$
+sELECT table_A.a, table_A.b, table_B.a, table_B.b 
+FROM table_A inner join table_B 
+on table_A.a<table_B.a and table_A.b>table_B.b;
+$
+sELECT table_A.a, table_A.b, table_B.a, table_B.b 
+FROM table_A left join table_B 
+on table_A.a<table_B.a and table_A.b>table_B.b;
+$
+sELECT a, b,c,d,e,  g 
+FROM (select a, b,c,d from table_a) natural join table_B 
+natural join table_C 
+where b>3;
+$
+select a+1, b*2+c, c+d from table_a
+$
+select a+1, b*2+c, c+d 
+from table_a 
+where a+3>=2*d-1
+$
+sELECT a, b, sum(c), count(*) 
+FROM table_A  natural join table_B 
+where a>1 and b>2 
+GROUP BY a,b;
+$
+#
+
+

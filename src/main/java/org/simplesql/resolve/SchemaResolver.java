@@ -2,10 +2,12 @@
 package org.simplesql.resolve;
 
 import java.io.File;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -23,7 +25,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 public class SchemaResolver {
 	private Map<String, Map<String, Map<String,String>>> schema;
@@ -212,6 +213,14 @@ public class SchemaResolver {
 		
 		String [] reference = foreignKeys.get(table1).get(column1);
 		return reference[0].equals(table2) && reference[1].equals(column2);
+	}
+
+	public Set<String> getTables() {
+		return this.schema.keySet();
+	}
+
+	public Set<String> getColumns(String table) {
+		return schema.get(table).keySet();
 	}
 
 }

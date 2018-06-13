@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -31,6 +33,41 @@ public class SimpleSQL {
 	public static void setSchema(URL schema) throws IOException{
 		resolver = new SchemaResolver(schema);
 	}
+	
+	public static void printSchema() {
+		Set<String> tables = resolver.getTables();
+		for(String table:tables) {
+			printSchema(table);
+		}
+	}
+	
+	private static void printSchema(String table) {
+		Set<String> cols = new TreeSet<String>(resolver.getColumns(table));
+		
+		System.out.printf("\nTable Name: %s\n", table);
+		System.out.println(bar(23, false));
+		System.out.printf("|%10s|%10s|\n", "COLUMN", "TYPE");
+			
+		for(String col:cols) {
+			String type = resolver.getType(table, col);
+			System.out.println(bar(23, true));
+			System.out.printf("|%10s|%10s|\n", col, type);
+		}
+		System.out.println(bar(23, false));
+	}
+
+	public static String bar(int len, boolean border) {
+		StringBuilder sb = new StringBuilder();
+		for(int i=0;i<len;i++) {
+			if(i!=0 && i!=len-1||!border) {
+				sb.append("-");
+			}else {
+				sb.append("|");
+			}
+		}
+		return sb.toString();
+	}
+
 	
 	public static SchemaResolver getSchemaResolver(){
 		return resolver;

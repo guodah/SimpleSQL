@@ -1,21 +1,12 @@
 package org.simplesql.relational_algebra;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
+import java.util.Arrays;
 import org.simplesql.SimpleSQL;
-import org.simplesql.iterators.ProjectIterator;
-import org.simplesql.iterators.Row;
-import org.simplesql.parse.SimpleSQLLexer;
 import org.simplesql.parse.SimpleSQLParser;
 import org.simplesql.parse.SimpleSQLParser.ColumnContext;
 import org.simplesql.parse.SimpleSQLParser.ExprContext;
@@ -25,8 +16,6 @@ import org.simplesql.parse.SimpleSQLParser.Literal_valueContext;
 import org.simplesql.parse.SimpleSQLParser.ParseContext;
 import org.simplesql.parse.SimpleSQLParser.RelationContext;
 import org.simplesql.resolve.SchemaResolver;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 public class Utilities {
 	@SuppressWarnings("unchecked")
@@ -264,4 +253,6 @@ public class Utilities {
 					join_operatorContext.join_type().getText());			
 		}
 	}
+	
+	
 }
